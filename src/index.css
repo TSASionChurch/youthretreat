@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  --color-brand-white: #FFFFFF;
+  --color-brand-navy: #0A1128;
+  --color-brand-red: #D92B27;
+  --color-brand-yellow: #FFE600;
+  --color-brand-slate: #64748B;
+}
+
+@layer base {
+  html {
+    font-family: "DM Sans", sans-serif;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-white text-[#0A1128] antialiased selection:bg-[#D92B27] selection:text-white;
+  }
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+  width: max-content;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FFFFFF;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-[#D92B27]/40 hover:bg-[#D92B27] rounded-full transition-colors;
+}
