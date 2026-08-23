@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import QRCode from 'react-qr-code';
 
-const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbylQqBn0eAWxne3_1JJUIMRT4JR88LbaQrJDyUPu2xYY--4UeZoacFIjm7B6g8aX-Ka/exec";
+const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWVc2oF6J6CXp4Qn5PeD-vVNCMLUvo52_RxxJCaaHXYO-NFuC8YzvPcwt10GAQCD1U/exec";
 const CHURCHES = [
   "Sion Tamil Corps",
   "Jerimeri Corps",
@@ -18,7 +19,7 @@ const CHURCHES = [
   "Nallasopara Corps",
   "Panjarpol Corps",
   "Parel",
-  "Shwerri Outpost",
+  "Sewri Outpost",
   "Ulhasnagar Corps",
   "Vithhalwadi",
   "Wadala Corps",
@@ -26,9 +27,43 @@ const CHURCHES = [
 
 const TSHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "Other"];
 
+// Converts an SVG element to a PNG Base64 string via an off-screen canvas
+async function svgElementToBase64Png(svgEl: SVGSVGElement, size: number): Promise<string> {
+  const serializer = new XMLSerializer();
+  const svgStr = serializer.serializeToString(svgEl);
+  const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d')!;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      ctx.drawImage(img, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = (err) => { URL.revokeObjectURL(url); reject(err); };
+    img.src = url;
+  });
+}
+
+function formatDateToMMDDYYYY(dateStr: string): string {
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if (parts.length !== 3) return dateStr;
+  const [year, month, day] = parts;
+  return `${month}/${day}/${year}`;
+}
+
 export default function Register() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isDuplicate, setIsDuplicate] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
@@ -55,37 +90,30 @@ export default function Register() {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
+    setSubmitError(null);
+    setIsDuplicate(false);
+
+    const formattedDob = formatDateToMMDDYYYY(formData.dob);
 
     const finalPayload = {
       name: formData.name.trim(),
-
-      gender:
-        formData.gender === "Other"
-          ? formData.otherGender.trim() || "Other"
-          : formData.gender,
-
-      dob: formData.dob,
-
+      gender: formData.gender === "Other" ? formData.otherGender.trim() || "Other" : formData.gender,
+      dob: formattedDob,
       phone: formData.phone.trim(),
-
       email: formData.email.trim(),
-
-      church:
-        formData.church === "Other"
-          ? formData.otherChurch.trim() || "Other"
-          : formData.church,
-
+      church: formData.church === "Other" ? formData.otherChurch.trim() || "Other" : formData.church,
       isOfficer: formData.isOfficer,
-
-      tshirtSize:
-        formData.tshirtSize === "Other"
-          ? formData.otherTshirtSize.trim() || "Other"
-          : formData.tshirtSize,
+      tshirtSize: formData.tshirtSize === "Other" ? formData.otherTshirtSize.trim() || "Other" : formData.tshirtSize,
     };
 
     try {
+      // -------------------------------------------------------
+      // 1. FIRST: Submit the registration WITHOUT QR code
+      //    This gets us the server-generated UID
+      // -------------------------------------------------------
       const formParams = new URLSearchParams();
 
+      // Don't send uid - let the server generate it
       formParams.append("name", finalPayload.name);
       formParams.append("dob", finalPayload.dob);
       formParams.append("gender", finalPayload.gender);
@@ -94,6 +122,8 @@ export default function Register() {
       formParams.append("church", finalPayload.church);
       formParams.append("officers", finalPayload.isOfficer);
       formParams.append("size", finalPayload.tshirtSize);
+      // Send a placeholder QR for now
+      formParams.append("qrBase64", "");
 
       const response = await fetch(GOOGLE_APP_SCRIPT_URL, {
         method: "POST",
@@ -101,19 +131,142 @@ export default function Register() {
       });
 
       const responseText = await response.text();
-      console.log("Apps Script response:", responseText);
+      console.log("Apps Script response (initial):", responseText);
 
+      // -------------------------------------------------------
+      // 2. Parse the response to get the server-generated UID
+      // -------------------------------------------------------
+      let result: {
+        success: boolean;
+        duplicate?: boolean;
+        message?: string;
+        error?: string;
+        uid?: string;
+        age?: number;
+        ageGroup?: string;
+        emailSent?: boolean;
+      };
+
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        result = { success: response.ok };
+      }
+
+      if (!result.success) {
+        if (result.duplicate) {
+          setIsDuplicate(true);
+          setSubmitError(
+            result.message ||
+            "A registration already exists for this name and date of birth."
+          );
+        } else {
+          setSubmitError(
+            result.error ||
+            result.message ||
+            "Registration failed. Please try again."
+          );
+        }
+        return;
+      }
+
+      // Get the server-generated UID
+      const serverUid = result.uid;
+      if (!serverUid) {
+        throw new Error("Server did not return a UID");
+      }
+
+      console.log("Server-generated UID:", serverUid);
+
+      // -------------------------------------------------------
+      // 3. Generate QR code with the SERVER UID
+      // -------------------------------------------------------
+      const qrPayload = `${serverUid}|${finalPayload.name}|${finalPayload.dob}`;
+      console.log("QR Payload with server UID:", qrPayload);
+
+      let qrBase64 = "";
+      try {
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        document.body.appendChild(container);
+
+        const { createRoot } = await import('react-dom/client');
+        const root = createRoot(container);
+        await new Promise<void>((resolve) => {
+          root.render(
+            React.createElement(QRCode, {
+              value: qrPayload,
+              size: 300,
+              level: 'H',
+              bgColor: '#ffffff',
+              fgColor: '#0A1128',
+            })
+          );
+          setTimeout(resolve, 100);
+        });
+
+        const svgEl = container.querySelector('svg') as SVGSVGElement | null;
+        if (svgEl) {
+          qrBase64 = await svgElementToBase64Png(svgEl, 300);
+        }
+
+        root.unmount();
+        document.body.removeChild(container);
+      } catch (qrErr) {
+        console.warn('QR generation failed:', qrErr);
+      }
+
+      // -------------------------------------------------------
+      // 4. UPDATE the registration with the QR code
+      //    (Or you could resend the full registration with QR)
+      // -------------------------------------------------------
+      if (qrBase64) {
+        try {
+          const updateParams = new URLSearchParams();
+          updateParams.append("uid", serverUid);
+          updateParams.append("name", finalPayload.name);
+          updateParams.append("dob", finalPayload.dob);
+          updateParams.append("gender", finalPayload.gender);
+          updateParams.append("whatsapp", finalPayload.phone);
+          updateParams.append("email", finalPayload.email);
+          updateParams.append("church", finalPayload.church);
+          updateParams.append("officers", finalPayload.isOfficer);
+          updateParams.append("size", finalPayload.tshirtSize);
+          updateParams.append("qrBase64", qrBase64);
+
+          const updateResponse = await fetch(GOOGLE_APP_SCRIPT_URL, {
+            method: "POST",
+            body: updateParams,
+          });
+
+          const updateText = await updateResponse.text();
+          console.log("Update response:", updateText);
+        } catch (updateErr) {
+          console.warn("Failed to update registration with QR:", updateErr);
+        }
+      }
+
+      // -------------------------------------------------------
+      // 5. Navigate to confirmation with the server UID
+      // -------------------------------------------------------
       navigate("/confirmation", {
         state: {
-          user: finalPayload,
+          user: {
+            ...finalPayload,
+            uid: serverUid,
+            age: result.age ?? null,
+            ageGroup: result.ageGroup ?? "",
+            emailSent: result.emailSent ?? false,
+            qrData: qrPayload,
+          },
         },
       });
 
     } catch (error) {
       console.error("Registration submission failed:", error);
-
-      alert(
-        "There was a problem submitting your registration. Please try again."
+      setSubmitError(
+        "There was a problem submitting your registration. Please check your connection and try again."
       );
     } finally {
       setIsSubmitting(false);
@@ -163,8 +316,8 @@ export default function Register() {
             transition={{ delay: 0.05 }}
             onClick={() => setFocusedField('name')}
             className={`bg-white rounded-3xl p-6 sm:p-8 border transition-all duration-200 relative ${focusedField === 'name'
-                ? 'border-[#D92B27] border-l-8 shadow-sm'
-                : 'border-slate-200'
+              ? 'border-[#D92B27] border-l-8 shadow-sm'
+              : 'border-slate-200'
               }`}
           >
             <label htmlFor="name" className="block text-base sm:text-lg font-black text-[#0A1128] mb-2">
@@ -191,8 +344,8 @@ export default function Register() {
             transition={{ delay: 0.1 }}
             onClick={() => setFocusedField('dob')}
             className={`bg-white rounded-3xl p-6 sm:p-8 border transition-all duration-200 relative ${focusedField === 'dob'
-                ? 'border-[#D92B27] border-l-8 shadow-sm'
-                : 'border-slate-200'
+              ? 'border-[#D92B27] border-l-8 shadow-sm'
+              : 'border-slate-200'
               }`}
           >
             <label htmlFor="dob" className="block text-base sm:text-lg font-black text-[#0A1128] mb-2">
@@ -218,8 +371,8 @@ export default function Register() {
             transition={{ delay: 0.15 }}
             onClick={() => setFocusedField('gender')}
             className={`bg-white rounded-3xl p-6 sm:p-8 border transition-all duration-200 relative ${focusedField === 'gender'
-                ? 'border-[#D92B27] border-l-8 shadow-sm'
-                : 'border-slate-200'
+              ? 'border-[#D92B27] border-l-8 shadow-sm'
+              : 'border-slate-200'
               }`}
           >
             <label className="block text-base sm:text-lg font-black text-[#0A1128] mb-4">
@@ -279,8 +432,8 @@ export default function Register() {
             transition={{ delay: 0.2 }}
             onClick={() => setFocusedField('phone')}
             className={`bg-white rounded-3xl p-6 sm:p-8 border transition-all duration-200 relative ${focusedField === 'phone'
-                ? 'border-[#D92B27] border-l-8 shadow-sm'
-                : 'border-slate-200'
+              ? 'border-[#D92B27] border-l-8 shadow-sm'
+              : 'border-slate-200'
               }`}
           >
             <label htmlFor="phone" className="block text-base sm:text-lg font-black text-[#0A1128] mb-2">
@@ -307,8 +460,8 @@ export default function Register() {
             transition={{ delay: 0.25 }}
             onClick={() => setFocusedField('email')}
             className={`bg-white rounded-3xl p-6 sm:p-8 border transition-all duration-200 relative ${focusedField === 'email'
-                ? 'border-[#D92B27] border-l-8 shadow-sm'
-                : 'border-slate-200'
+              ? 'border-[#D92B27] border-l-8 shadow-sm'
+              : 'border-slate-200'
               }`}
           >
             <label htmlFor="email" className="block text-base sm:text-lg font-black text-[#0A1128] mb-2">
@@ -335,8 +488,8 @@ export default function Register() {
             transition={{ delay: 0.3 }}
             onClick={() => setFocusedField('church')}
             className={`bg-white rounded-3xl p-6 sm:p-8 border transition-all duration-200 relative ${focusedField === 'church'
-                ? 'border-[#D92B27] border-l-8 shadow-sm'
-                : 'border-slate-200'
+              ? 'border-[#D92B27] border-l-8 shadow-sm'
+              : 'border-slate-200'
               }`}
           >
             <label htmlFor="church" className="block text-base sm:text-lg font-black text-[#0A1128] mb-2">
@@ -392,8 +545,8 @@ export default function Register() {
             transition={{ delay: 0.35 }}
             onClick={() => setFocusedField('isOfficer')}
             className={`bg-white rounded-3xl p-6 sm:p-8 border transition-all duration-200 relative ${focusedField === 'isOfficer'
-                ? 'border-[#D92B27] border-l-8 shadow-sm'
-                : 'border-slate-200'
+              ? 'border-[#D92B27] border-l-8 shadow-sm'
+              : 'border-slate-200'
               }`}
           >
             <label className="block text-base sm:text-lg font-black text-[#0A1128] mb-4">
@@ -434,8 +587,8 @@ export default function Register() {
             transition={{ delay: 0.4 }}
             onClick={() => setFocusedField('tshirtSize')}
             className={`bg-white rounded-3xl p-6 sm:p-8 border transition-all duration-200 relative ${focusedField === 'tshirtSize'
-                ? 'border-[#D92B27] border-l-8 shadow-sm'
-                : 'border-slate-200'
+              ? 'border-[#D92B27] border-l-8 shadow-sm'
+              : 'border-slate-200'
               }`}
           >
             <label className="block text-base sm:text-lg font-black text-[#0A1128] mb-4">
@@ -489,6 +642,29 @@ export default function Register() {
             </AnimatePresence>
           </motion.div>
 
+          {/* ERROR / DUPLICATE BANNER */}
+          <AnimatePresence>
+            {submitError && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className={`rounded-2xl p-5 border flex items-start gap-4 ${isDuplicate
+                  ? 'bg-amber-50 border-amber-300 text-amber-900'
+                  : 'bg-red-50 border-red-300 text-red-900'
+                  }`}
+              >
+                <AlertCircle size={22} className="shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-black text-base">
+                    {isDuplicate ? 'Already Registered' : 'Submission Failed'}
+                  </p>
+                  <p className="text-sm font-medium mt-1">{submitError}</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* FORM FOOTER / SUBMIT ACTION CARD */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -513,7 +689,11 @@ export default function Register() {
 
             <button
               type="button"
-              onClick={() => setFormData({ name: '', gender: '', otherGender: '', isOfficer: '', dob: '', phone: '', email: '', church: '', otherChurch: '', tshirtSize: '', otherTshirtSize: '' })}
+              onClick={() => {
+                setFormData({ name: '', gender: '', otherGender: '', isOfficer: '', dob: '', phone: '', email: '', church: '', otherChurch: '', tshirtSize: '', otherTshirtSize: '' });
+                setSubmitError(null);
+                setIsDuplicate(false);
+              }}
               className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500 hover:text-[#D92B27] transition-colors py-2 px-4"
             >
               Clear Form

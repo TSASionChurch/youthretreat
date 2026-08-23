@@ -12,12 +12,18 @@ export default function Confirmation() {
     return <Navigate to="/" replace />;
   }
 
-  const qrData = JSON.stringify({
-    name: user.name,
-    church: user.church,
-    tshirt: user.tshirtSize,
-    timestamp: new Date().toISOString()
-  });
+  // Construct QR data in the UID|Name|DOB format required by the verification script
+  const qrData = (() => {
+    if (user.qrData && user.qrData.includes('|')) {
+      const parts = user.qrData.split('|');
+      if (parts.length >= 3) {
+        // Ensure the QR code uses the final server-returned UID
+        parts[0] = user.uid;
+        return parts.join('|');
+      }
+    }
+    return `${user.uid}|${user.name}|${user.dob}`;
+  })();
 
   return (
     <div className="min-h-screen pt-24 pb-32 bg-[#F8FAFC] text-[#0A1128] flex flex-col items-center justify-center relative overflow-hidden px-4">
@@ -37,6 +43,11 @@ export default function Confirmation() {
           <p className="text-lg md:text-xl font-semibold text-slate-600">
             Thank you, <span className="text-[#0A1128] font-black">{user.name}</span>. Here is your official Retreat Pass.
           </p>
+          {user.emailSent && (
+            <p className="mt-3 text-sm text-green-700 font-semibold bg-green-50 border border-green-200 rounded-xl px-4 py-2 inline-block">
+              ✅ Confirmation email sent to {user.email}
+            </p>
+          )}
         </div>
 
         {/* Ticket Pass */}
@@ -81,6 +92,18 @@ export default function Confirmation() {
               <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1">Church / Corps</p>
               <p className="text-lg font-black uppercase tracking-tight text-white">{user.church}</p>
             </div>
+            {user.ageGroup && (
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1">Age Group</p>
+                <p className="text-lg font-black uppercase text-white">{user.ageGroup}</p>
+              </div>
+            )}
+            {user.uid && (
+              <div className="col-span-2 border-t border-white/10 pt-4">
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1">Registration ID</p>
+                <p className="text-xl font-black tracking-widest text-white">{user.uid}</p>
+              </div>
+            )}
           </div>
         </div>
 
