@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
 import QRCode from 'react-qr-code';
 
-const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWVc2oF6J6CXp4Qn5PeD-vVNCMLUvo52_RxxJCaaHXYO-NFuC8YzvPcwt10GAQCD1U/exec";
+const GOOGLE_APP_SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL || "";
 const CHURCHES = [
   "Sion Tamil Corps",
   "Jerimeri Corps",
@@ -84,194 +84,208 @@ export default function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (isSubmitting) return;
+  if (isSubmitting) return;
 
-    setIsSubmitting(true);
-    setSubmitError(null);
-    setIsDuplicate(false);
+  setIsSubmitting(true);
+  setSubmitError(null);
+  setIsDuplicate(false);
 
-    const formattedDob = formatDateToMMDDYYYY(formData.dob);
+  const formattedDob = formatDateToMMDDYYYY(formData.dob);
 
-    const finalPayload = {
-      name: formData.name.trim(),
-      gender: formData.gender === "Other" ? formData.otherGender.trim() || "Other" : formData.gender,
-      dob: formattedDob,
-      phone: formData.phone.trim(),
-      email: formData.email.trim(),
-      church: formData.church === "Other" ? formData.otherChurch.trim() || "Other" : formData.church,
-      isOfficer: formData.isOfficer,
-      tshirtSize: formData.tshirtSize === "Other" ? formData.otherTshirtSize.trim() || "Other" : formData.tshirtSize,
+  const finalPayload = {
+    name: formData.name.trim(),
+    gender: formData.gender === "Other" ? formData.otherGender.trim() || "Other" : formData.gender,
+    dob: formattedDob,
+    phone: formData.phone.trim(),
+    email: formData.email.trim(),
+    church: formData.church === "Other" ? formData.otherChurch.trim() || "Other" : formData.church,
+    isOfficer: formData.isOfficer,
+    tshirtSize: formData.tshirtSize === "Other" ? formData.otherTshirtSize.trim() || "Other" : formData.tshirtSize,
+  };
+
+  try {
+    // -------------------------------------------------------
+    // STEP 1: Get server-generated UID (no sheet write yet)
+    // -------------------------------------------------------
+    const generateParams = new URLSearchParams();
+    generateParams.append("name", finalPayload.name);
+    generateParams.append("dob", finalPayload.dob);
+    generateParams.append("gender", finalPayload.gender);
+    generateParams.append("whatsapp", finalPayload.phone);
+    generateParams.append("email", finalPayload.email);
+    generateParams.append("church", finalPayload.church);
+    generateParams.append("officers", finalPayload.isOfficer);
+    generateParams.append("size", finalPayload.tshirtSize);
+    generateParams.append("step", "generate");
+
+    const generateResponse = await fetch(GOOGLE_APP_SCRIPT_URL, {
+      method: "POST",
+      body: generateParams,
+    });
+
+    const generateText = await generateResponse.text();
+    console.log("Generate response:", generateText);
+
+    let generateResult: {
+      success: boolean;
+      step?: string;
+      uid?: string;
+      name?: string;
+      dob?: string;
+      age?: number;
+      ageGroup?: string;
+      duplicate?: boolean;
+      message?: string;
+      error?: string;
     };
 
     try {
-      // -------------------------------------------------------
-      // 1. FIRST: Submit the registration WITHOUT QR code
-      //    This gets us the server-generated UID
-      // -------------------------------------------------------
-      const formParams = new URLSearchParams();
-
-      // Don't send uid - let the server generate it
-      formParams.append("name", finalPayload.name);
-      formParams.append("dob", finalPayload.dob);
-      formParams.append("gender", finalPayload.gender);
-      formParams.append("whatsapp", finalPayload.phone);
-      formParams.append("email", finalPayload.email);
-      formParams.append("church", finalPayload.church);
-      formParams.append("officers", finalPayload.isOfficer);
-      formParams.append("size", finalPayload.tshirtSize);
-      // Send a placeholder QR for now
-      formParams.append("qrBase64", "");
-
-      const response = await fetch(GOOGLE_APP_SCRIPT_URL, {
-        method: "POST",
-        body: formParams,
-      });
-
-      const responseText = await response.text();
-      console.log("Apps Script response (initial):", responseText);
-
-      // -------------------------------------------------------
-      // 2. Parse the response to get the server-generated UID
-      // -------------------------------------------------------
-      let result: {
-        success: boolean;
-        duplicate?: boolean;
-        message?: string;
-        error?: string;
-        uid?: string;
-        age?: number;
-        ageGroup?: string;
-        emailSent?: boolean;
-      };
-
-      try {
-        result = JSON.parse(responseText);
-      } catch {
-        result = { success: response.ok };
-      }
-
-      if (!result.success) {
-        if (result.duplicate) {
-          setIsDuplicate(true);
-          setSubmitError(
-            result.message ||
-            "A registration already exists for this name and date of birth."
-          );
-        } else {
-          setSubmitError(
-            result.error ||
-            result.message ||
-            "Registration failed. Please try again."
-          );
-        }
-        return;
-      }
-
-      // Get the server-generated UID
-      const serverUid = result.uid;
-      if (!serverUid) {
-        throw new Error("Server did not return a UID");
-      }
-
-      console.log("Server-generated UID:", serverUid);
-
-      // -------------------------------------------------------
-      // 3. Generate QR code with the SERVER UID
-      // -------------------------------------------------------
-      const qrPayload = `${serverUid}|${finalPayload.name}|${finalPayload.dob}`;
-      console.log("QR Payload with server UID:", qrPayload);
-
-      let qrBase64 = "";
-      try {
-        const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        document.body.appendChild(container);
-
-        const { createRoot } = await import('react-dom/client');
-        const root = createRoot(container);
-        await new Promise<void>((resolve) => {
-          root.render(
-            React.createElement(QRCode, {
-              value: qrPayload,
-              size: 300,
-              level: 'H',
-              bgColor: '#ffffff',
-              fgColor: '#0A1128',
-            })
-          );
-          setTimeout(resolve, 100);
-        });
-
-        const svgEl = container.querySelector('svg') as SVGSVGElement | null;
-        if (svgEl) {
-          qrBase64 = await svgElementToBase64Png(svgEl, 300);
-        }
-
-        root.unmount();
-        document.body.removeChild(container);
-      } catch (qrErr) {
-        console.warn('QR generation failed:', qrErr);
-      }
-
-      // -------------------------------------------------------
-      // 4. UPDATE the registration with the QR code
-      //    (Or you could resend the full registration with QR)
-      // -------------------------------------------------------
-      if (qrBase64) {
-        try {
-          const updateParams = new URLSearchParams();
-          updateParams.append("uid", serverUid);
-          updateParams.append("name", finalPayload.name);
-          updateParams.append("dob", finalPayload.dob);
-          updateParams.append("gender", finalPayload.gender);
-          updateParams.append("whatsapp", finalPayload.phone);
-          updateParams.append("email", finalPayload.email);
-          updateParams.append("church", finalPayload.church);
-          updateParams.append("officers", finalPayload.isOfficer);
-          updateParams.append("size", finalPayload.tshirtSize);
-          updateParams.append("qrBase64", qrBase64);
-
-          const updateResponse = await fetch(GOOGLE_APP_SCRIPT_URL, {
-            method: "POST",
-            body: updateParams,
-          });
-
-          const updateText = await updateResponse.text();
-          console.log("Update response:", updateText);
-        } catch (updateErr) {
-          console.warn("Failed to update registration with QR:", updateErr);
-        }
-      }
-
-      // -------------------------------------------------------
-      // 5. Navigate to confirmation with the server UID
-      // -------------------------------------------------------
-      navigate("/confirmation", {
-        state: {
-          user: {
-            ...finalPayload,
-            uid: serverUid,
-            age: result.age ?? null,
-            ageGroup: result.ageGroup ?? "",
-            emailSent: result.emailSent ?? false,
-            qrData: qrPayload,
-          },
-        },
-      });
-
-    } catch (error) {
-      console.error("Registration submission failed:", error);
-      setSubmitError(
-        "There was a problem submitting your registration. Please check your connection and try again."
-      );
-    } finally {
-      setIsSubmitting(false);
+      generateResult = JSON.parse(generateText);
+    } catch {
+      generateResult = { success: generateResponse.ok };
     }
-  };
+
+    if (!generateResult.success) {
+      if (generateResult.duplicate) {
+        setIsDuplicate(true);
+        setSubmitError(
+          generateResult.message ||
+          "A registration already exists for this name and date of birth."
+        );
+      } else {
+        setSubmitError(
+          generateResult.error ||
+          generateResult.message ||
+          "Registration failed. Please try again."
+        );
+      }
+      return;
+    }
+
+    const serverUid = generateResult.uid;
+    if (!serverUid) {
+      throw new Error("Server did not return a UID");
+    }
+
+    console.log("Server-generated UID:", serverUid);
+
+    // -------------------------------------------------------
+    // STEP 2: Generate QR code with the SERVER UID
+    // -------------------------------------------------------
+    const qrPayload = `${serverUid}|${finalPayload.name}|${finalPayload.dob}`;
+    console.log("QR Payload with server UID:", qrPayload);
+
+    let qrBase64 = "";
+    try {
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      document.body.appendChild(container);
+
+      const { createRoot } = await import('react-dom/client');
+      const root = createRoot(container);
+      await new Promise<void>((resolve) => {
+        root.render(
+          React.createElement(QRCode, {
+            value: qrPayload,
+            size: 300,
+            level: 'H',
+            bgColor: '#ffffff',
+            fgColor: '#0A1128',
+          })
+        );
+        setTimeout(resolve, 100);
+      });
+
+      const svgEl = container.querySelector('svg') as SVGSVGElement | null;
+      if (svgEl) {
+        qrBase64 = await svgElementToBase64Png(svgEl, 300);
+      }
+
+      root.unmount();
+      document.body.removeChild(container);
+    } catch (qrErr) {
+      console.warn('QR generation failed:', qrErr);
+    }
+
+    // -------------------------------------------------------
+    // STEP 3: Finalize registration with QR code
+    // -------------------------------------------------------
+    const finalizeParams = new URLSearchParams();
+    finalizeParams.append("name", finalPayload.name);
+    finalizeParams.append("dob", finalPayload.dob);
+    finalizeParams.append("gender", finalPayload.gender);
+    finalizeParams.append("whatsapp", finalPayload.phone);
+    finalizeParams.append("email", finalPayload.email);
+    finalizeParams.append("church", finalPayload.church);
+    finalizeParams.append("officers", finalPayload.isOfficer);
+    finalizeParams.append("size", finalPayload.tshirtSize);
+    finalizeParams.append("qrBase64", qrBase64 || "");
+    finalizeParams.append("step", "finalize");
+    finalizeParams.append("tempUid", serverUid);
+
+    const finalizeResponse = await fetch(GOOGLE_APP_SCRIPT_URL, {
+      method: "POST",
+      body: finalizeParams,
+    });
+
+    const finalizeText = await finalizeResponse.text();
+    console.log("Finalize response:", finalizeText);
+
+    let finalizeResult: {
+      success: boolean;
+      step?: string;
+      message?: string;
+      error?: string;
+      uid?: string;
+      age?: number;
+      ageGroup?: string;
+      emailSent?: boolean;
+    };
+
+    try {
+      finalizeResult = JSON.parse(finalizeText);
+    } catch {
+      finalizeResult = { success: finalizeResponse.ok };
+    }
+
+    if (!finalizeResult.success) {
+      setSubmitError(
+        finalizeResult.error ||
+        finalizeResult.message ||
+        "Failed to save registration. Please try again."
+      );
+      return;
+    }
+
+    // -------------------------------------------------------
+    // STEP 4: Navigate to confirmation
+    // -------------------------------------------------------
+    navigate("/confirmation", {
+      state: {
+        user: {
+          ...finalPayload,
+          uid: serverUid,
+          age: finalizeResult.age ?? generateResult.age ?? null,
+          ageGroup: finalizeResult.ageGroup ?? generateResult.ageGroup ?? "",
+          emailSent: finalizeResult.emailSent ?? false,
+          qrData: qrPayload,
+        },
+      },
+    });
+
+  } catch (error) {
+    console.error("Registration submission failed:", error);
+    setSubmitError(
+      "There was a problem submitting your registration. Please check your connection and try again."
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen pt-24 sm:pt-32 pb-24 bg-[#F8FAFC] text-[#0A1128]">
