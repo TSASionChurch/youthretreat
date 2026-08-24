@@ -64,8 +64,7 @@ function PillTag({ label, variant }: { label: string; variant: 'dark' | 'red' | 
 export default function Home() {
   const mapUrl = 'https://maps.app.goo.gl/FopB2t33gXKW2yux7';
   const embedMapUrl =
-    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3771.218520264101!2d72.8624!3d19.0425!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c92ea8dd9f85%3A0x6b86cf81fbf2df6b!2sThe%20Salvation%20Army%20Church%20Sion!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin';
-
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4233.320311454406!2d72.8571873112368!3d19.033723482087858!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c92a7019f37d%3A0xbf05632e51e35ef6!2sSalvation%20Army%20Tamil%20Church%2C%20Women%20And%20Children%20Home!5e1!3m2!1sen!2sin!4v1787584878953!5m2!1sen!2sin';
   return (
     <div className="w-full overflow-x-hidden bg-white text-[#0A1128]">
 
@@ -261,7 +260,9 @@ export default function Home() {
                     </h3>
                     <p className="text-sm sm:text-base font-semibold text-[#0A1128]/50 flex items-start gap-2 leading-relaxed">
                       <MapPin size={15} className="text-[#D92B27] mt-0.5 shrink-0" />
-                      Salvation Army Tamil Church, Sion,<br />Mumbai, Maharashtra 400022
+                     6, First Floor, Plot No, 60 Feet Road, <br />
+                     Opposite Manav Seva Sangh, Sion East,<br />
+                      Sion, Mumbai, Maharashtra 400022
                     </p>
                   </div>
 
