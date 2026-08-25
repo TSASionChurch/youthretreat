@@ -5,106 +5,121 @@ interface StaircasePreloaderProps {
   onComplete?: () => void;
 }
 
-const BIBLE_VERSES = [
-  {
-    verse: "One generation shall commend your works to another, and shall declare your mighty acts.",
-    reference: "Psalm 145:4"
-  },
-  {
-    verse: "Don't let anyone look down on you because you are young, but set an example for believers in faith and love.",
-    reference: "1 Timothy 4:12"
-  },
-  {
-    verse: "Those who hope in the LORD will renew their strength. They will soar on wings like eagles.",
-    reference: "Isaiah 40:31"
-  }
+const WORDS = [
+  { text: "FAITH", range: [0, 25] },
+  { text: "HOPE", range: [26, 50] },
+  { text: "FELLOWSHIP", range: [51, 75] },
+  { text: "SION", range: [76, 100] }
 ];
 
 export default function StaircasePreloader({ onComplete }: StaircasePreloaderProps) {
+  const [percent, setPercent] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentVerse] = useState(() => BIBLE_VERSES[Math.floor(Math.random() * BIBLE_VERSES.length)]);
 
   useEffect(() => {
-    // Show preloader for 2.6 seconds then trigger staircase exit
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2600);
+    let start = 0;
+    const end = 100;
+    const duration = 1800; // 1.8 seconds loading speed
+    const stepTime = Math.abs(Math.floor(duration / end));
+    
+    const timer = setInterval(() => {
+      start += 1;
+      setPercent(start);
+      if (start >= end) {
+        clearInterval(timer);
+        // Soft pause at 100% before reveal
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 500);
+      }
+    }, stepTime);
 
-    return () => clearTimeout(timer);
+    return () => clearInterval(timer);
   }, []);
 
-  const columnCount = 5;
+  // Determine active word based on counter percentage
+  const getActiveWord = () => {
+    const found = WORDS.find(w => percent >= w.range[0] && percent <= w.range[1]);
+    return found ? found.text : "SION";
+  };
 
   return (
     <AnimatePresence onExitComplete={onComplete}>
       {isLoading && (
-        <div className="fixed inset-0 z-[9999] pointer-events-auto flex items-center justify-center overflow-hidden">
-          
-          {/* STAIRCASE COLUMNS WITH SHADOW & STAGGERED STEP SHAPE */}
-          <div className="absolute inset-0 grid grid-cols-5 w-full h-full">
-            {Array.from({ length: columnCount }).map((_, index) => (
-              <motion.div
-                key={index}
-                initial={{ y: 0 }}
-                exit={{ 
-                  y: '-100%',
-                  transition: { 
-                    duration: 0.85, 
-                    ease: [0.76, 0, 0.24, 1], 
-                    delay: index * 0.12 
-                  } 
-                }}
-                className="w-full h-full bg-[#0B0F19] border-r border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.9)] relative"
-              >
-                {/* Staircase Step Edge Line */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-red/60" />
-              </motion.div>
-            ))}
+        <motion.div
+          key="preloader-wrapper"
+          initial={{ y: 0 }}
+          exit={{ 
+            y: '-100%',
+            transition: { 
+              duration: 0.95, 
+              ease: [0.85, 0, 0.15, 1] 
+            } 
+          }}
+          className="fixed inset-0 z-[9999] bg-[#0A1128] text-white flex flex-col justify-between p-6 sm:p-10 md:p-16 overflow-hidden pointer-events-auto"
+        >
+          {/* Subtle Grid backing */}
+          <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] bg-[size:32px_32px] opacity-[0.02] pointer-events-none" />
+
+          {/* Top Info Banner */}
+          <div className="relative z-10 flex items-center justify-between">
+            <span className="text-[10px] font-black tracking-[0.3em] uppercase text-white/50">
+              TSA Sion Church Tamil
+            </span>
+            <span className="text-[10px] font-black tracking-[0.3em] uppercase text-[#D92B27]">
+              Mumbai, India
+            </span>
           </div>
 
-          {/* MINIMALIST FLOATING TYPOGRAPHY CONTENT */}
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ 
-              opacity: 0, 
-              y: -30,
-              transition: { duration: 0.3 } 
-            }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="relative z-20 max-w-4xl mx-auto px-6 text-center"
-          >
-            {/* Event Tag */}
-            <motion.p 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="text-brand-red font-black uppercase tracking-[0.3em] text-xs sm:text-sm mb-8"
-            >
-              Youth Retreat 2026 • Empowering Generations
-            </motion.p>
+          {/* Center Dynamic Word Reveal */}
+          <div className="relative z-10 flex-grow flex items-center justify-center">
+            <div className="overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.h2
+                  key={getActiveWord()}
+                  initial={{ y: '100%', opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: '-100%', opacity: 0 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="font-bold text-center tracking-tight text-white uppercase"
+                  style={{ 
+                    fontFamily: "Unbounded", 
+                    fontSize: "clamp(36px, 8vw, 90px)", 
+                    letterSpacing: "-0.04em" 
+                  }}
+                >
+                  {getActiveWord()}
+                </motion.h2>
+              </AnimatePresence>
+            </div>
+          </div>
 
-            {/* Clean Floating Verse Text */}
-            <motion.h2 
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.2] max-w-3xl mx-auto"
-            >
-              "{currentVerse.verse}"
-            </motion.h2>
+          {/* Bottom Counters */}
+          <div className="relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between border-t border-white/10 pt-6 sm:pt-10 gap-4">
+            
+            {/* Mission Statement */}
+            <span className="text-white/40 text-[10px] sm:text-xs font-semibold max-w-xs leading-relaxed">
+              Empowering generations through holiness, service, and fellowship.
+            </span>
 
-            {/* Scripture Reference */}
-            <motion.p 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45 }}
-              className="text-brand-red font-black uppercase tracking-widest text-sm sm:text-base mt-6 sm:mt-8"
-            >
-              — {currentVerse.reference}
-            </motion.p>
-          </motion.div>
-        </div>
+            {/* Awwwards Style Percent Count */}
+            <div className="flex items-baseline gap-1 self-end sm:self-auto">
+              <span 
+                className="font-black text-white leading-none tabular-nums"
+                style={{ 
+                  fontFamily: "Unbounded", 
+                  fontSize: "clamp(48px, 9vw, 96px)", 
+                  letterSpacing: "-0.04em" 
+                }}
+              >
+                {String(percent).padStart(3, '0')}
+              </span>
+              <span className="text-[#FFE600] font-black text-xl sm:text-2xl leading-none">%</span>
+            </div>
+
+          </div>
+
+        </motion.div>
       )}
     </AnimatePresence>
   );

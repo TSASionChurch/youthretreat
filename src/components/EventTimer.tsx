@@ -9,7 +9,11 @@ interface TimeLeft {
   seconds: number;
 }
 
-export default function EventTimer() {
+interface EventTimerProps {
+  compact?: boolean;
+}
+
+export default function EventTimer({ compact = false }: EventTimerProps) {
   const targetDate = new Date('2026-10-02T09:00:00');
 
   const calculateTimeLeft = (): TimeLeft => {
@@ -41,6 +45,56 @@ export default function EventTimer() {
     { label: 'Secs', value: timeLeft.seconds },
   ];
 
+  if (compact) {
+    return (
+      <div className="w-full flex flex-col md:flex-row items-center justify-between gap-6 p-4 sm:p-6 bg-[#0A1128]/95 backdrop-blur-md rounded-2xl border border-white/10 text-white select-none">
+        
+        {/* Info Left */}
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="p-2.5 rounded-xl bg-[#D92B27] text-white shrink-0 shadow-sm">
+            <Clock className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-1 text-[#FFE600] font-black uppercase tracking-widest text-[8px]">
+              <Sparkles className="w-3 h-3" />
+              <span>Retreat 2026 Countdown</span>
+            </div>
+            <h3 className="text-sm sm:text-base font-bold uppercase tracking-tight text-white/90">
+              Starts In
+            </h3>
+          </div>
+        </div>
+
+        {/* Counter Center */}
+        <div className="grid grid-cols-4 gap-2 sm:gap-3 w-full md:w-auto">
+          {timeUnits.map((unit, index) => (
+            <div
+              key={unit.label}
+              className="flex flex-col items-center justify-center p-2 min-w-[55px] sm:min-w-[65px] bg-white/5 border border-white/10 rounded-xl"
+            >
+              <span className="text-lg sm:text-2xl font-black text-[#FFE600] leading-none">
+                {String(unit.value).padStart(2, '0')}
+              </span>
+              <span className="text-[8px] font-bold uppercase tracking-wider text-white/50 mt-1">
+                {unit.label}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Date Right */}
+        <div className="flex items-center justify-center w-full md:w-auto mt-2 md:mt-0">
+          <div className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/10 border border-white/10 text-[9px] font-black tracking-widest uppercase text-white/90">
+            <Calendar className="w-3.5 h-3.5 shrink-0 text-[#FFE600]" />
+            <span>Oct 02, 2026</span>
+          </div>
+        </div>
+
+      </div>
+    );
+  }
+
+  // Default block rendering on standalone event pages (e.g. Retreat.tsx)
   return (
     <section className="bg-white py-12 sm:py-16 px-3 sm:px-4 md:px-8 border-y border-slate-200">
       <div className="max-w-[1600px] mx-auto">

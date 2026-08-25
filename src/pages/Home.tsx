@@ -1,38 +1,32 @@
-﻿import React, { useRef } from 'react';
+import React, { useRef } from 'react';
 import { motion, useInView } from 'motion/react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowRight, MapPin, Calendar, Clock, User, Users,
-  Sparkles, Navigation, ExternalLink, ChevronRight,
-  Globe, Shield, Music, Heart, Target, Mail, ArrowUpRight, Phone
+  ArrowRight, Church, Users, BookOpen,
+  Video, MapPin, Mail, Phone, ExternalLink, Calendar, Heart, Sparkles
 } from 'lucide-react';
 import EventTimer from '../components/EventTimer';
+import ImageCarousel from '../components/ImageCarousel';
 
-/* ── Reveal Wrapper ───────────────────────────────── */
+/* ── Utility: scroll-triggered reveal ─────────────────── */
 function Reveal({
-  children,
-  delay = 0,
-  className = '',
-  direction = 'up',
+  children, delay = 0, className = '', direction = 'up',
 }: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
+  children: React.ReactNode; delay?: number; className?: string;
   direction?: 'up' | 'left' | 'right';
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
-  const variants = {
-    up:    { hidden: { opacity: 0, y: 50 },  visible: { opacity: 1, y: 0 } },
+  const v = {
+    up:    { hidden: { opacity: 0, y: 50  }, visible: { opacity: 1, y: 0 } },
     left:  { hidden: { opacity: 0, x: -50 }, visible: { opacity: 1, x: 0 } },
-    right: { hidden: { opacity: 0, x: 50 },  visible: { opacity: 1, x: 0 } },
+    right: { hidden: { opacity: 0, x: 50  }, visible: { opacity: 1, x: 0 } },
   };
   return (
     <motion.div
-      ref={ref}
-      initial="hidden"
+      ref={ref} initial="hidden"
       animate={inView ? 'visible' : 'hidden'}
-      variants={variants[direction]}
+      variants={v[direction]}
       transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
       className={className}
     >
@@ -41,731 +35,414 @@ function Reveal({
   );
 }
 
-/* ── Pill Tag ─────────────────────────────────────── */
-function PillTag({ label, variant }: { label: string; variant: 'dark' | 'red' | 'yellow' | 'outline-dark' | 'outline-red' }) {
-  const styles: Record<string, string> = {
-    dark:           'bg-[#0A1128] text-white',
-    red:            'bg-[#D92B27] text-white',
-    yellow:         'bg-[#FFE600] text-[#0A1128]',
-    'outline-dark': 'bg-white border-2 border-[#0A1128] text-[#0A1128]',
-    'outline-red':  'bg-white border-2 border-[#D92B27] text-[#D92B27]',
-  };
+/* ── Marquee strip ─────────────────────────────────────── */
+function Marquee() {
+  const items = ['Faith', 'Hope', 'Fellowship', 'Service', 'Prayer', 'Community', 'Love', 'Grace'];
+  const doubled = [...items, ...items];
   return (
-    <motion.div
-      whileHover={{ scale: 1.06, y: -3 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      className={`px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-xl md:text-2xl font-black tracking-tight cursor-default shadow-sm ${styles[variant]}`}
-    >
-      {label}
-    </motion.div>
+    <div className="overflow-hidden bg-[#D92B27] py-3.5 border-y border-[#b82320]">
+      <motion.div
+        className="flex items-center whitespace-nowrap"
+        animate={{ x: ['0%', '-50%'] }}
+        transition={{ repeat: Infinity, repeatType: 'loop', duration: 18, ease: 'linear' }}
+      >
+        {doubled.map((w, i) => (
+          <span key={i} className="inline-flex items-center gap-3 text-white font-black uppercase text-xs tracking-[0.25em] px-6">
+            {w}
+            <span className="text-white/40">✦</span>
+          </span>
+        ))}
+      </motion.div>
+    </div>
   );
 }
 
+/* ── Service timing card ──────────────────────────────── */
+function ServiceCard({
+  icon, badge, title, time, desc, delay,
+}: {
+  icon: React.ReactNode; badge: string; title: string;
+  time: string; desc: string; delay: number;
+}) {
+  return (
+    <Reveal delay={delay} className="h-full border-r border-b border-slate-200">
+      <div
+        className="h-full bg-white p-6 sm:p-8 flex flex-col justify-between group hover:bg-[#0A1128] transition-all duration-500 min-h-[370px]"
+      >
+        <div>
+          <div className="w-12 h-12 rounded-xl bg-[#D92B27]/5 border border-[#D92B27]/10 flex items-center justify-center text-[#D92B27] mb-6 transition-all duration-300 group-hover:bg-white/10 group-hover:text-white">
+            {icon}
+          </div>
+          <span className="inline-block text-[8px] font-black uppercase tracking-[0.2em] bg-[#D92B27]/5 text-[#D92B27] px-2.5 py-1 rounded-full mb-4 transition-all duration-300 group-hover:bg-[#FFE600] group-hover:text-[#0A1128]">
+            {badge}
+          </span>
+          <h3 
+            className="text-lg font-bold text-[#0A1128] uppercase leading-tight tracking-tight transition-colors duration-300 group-hover:text-white"
+            style={{ fontFamily: 'Unbounded' }}
+          >
+            {title}
+          </h3>
+          <p className="text-[#D92B27] group-hover:text-[#FFE600] font-black text-xs uppercase tracking-wide mt-1.5 transition-colors duration-300">
+            {time}
+          </p>
+          <p className="text-slate-500 group-hover:text-slate-300 text-xs sm:text-sm mt-4 leading-relaxed font-semibold transition-colors duration-300">
+            {desc}
+          </p>
+        </div>
+        <div className="pt-5 mt-5 border-t border-slate-100 group-hover:border-white/10 flex items-center gap-1.5 text-[9px] font-black uppercase text-slate-300 group-hover:text-white/40 tracking-wider transition-colors duration-300">
+          <Calendar size={10} />
+          <span>Weekly Gathering</span>
+        </div>
+      </div>
+    </Reveal>
+  );
+}
+
+/* ── Main export ─────────────────────────────────────── */
 export default function Home() {
   const mapUrl = 'https://maps.app.goo.gl/FopB2t33gXKW2yux7';
   const embedMapUrl =
-    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4233.320311454406!2d72.8571873112368!3d19.033723482087858!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c92a7019f37d%3A0xbf05632e51e35ef6!2sSalvation%20Army%20Tamil%20Church%2C%20Women%20And%20Children%20Home!5e1!3m2!1sen!2sin!4v1787584878953!5m2!1sen!2sin';
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30173.47732297911!2d72.8218741743164!3d19.033612000000005!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c92a7019f37d%3A0xbf05632e51e35ef6!2sSalvation%20Army%20Tamil%20Church%2C%20Women%20And%20Children%20Home!5e0!3m2!1sen!2sin!4v1728552474695!5m2!1sen!2sin';
+
   return (
     <div className="w-full overflow-x-hidden bg-white text-[#0A1128]">
 
-      {/* ══════════════════════════════════════════════
-          HERO — Full viewport editorial with accents
-      ══════════════════════════════════════════════ */}
-      <section className="relative min-h-[95svh] flex flex-col justify-center px-4 md:px-10 pt-28 pb-16 overflow-hidden bg-white">
-
-        {/* Background geometric accents */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-32 -right-32 w-[700px] h-[700px] rounded-full border border-[#0A1128]/5" />
-          <div className="absolute -top-20 -right-20 w-[500px] h-[500px] rounded-full border border-[#0A1128]/5" />
-          <div className="absolute bottom-0 left-0 w-[600px] h-[400px] bg-gradient-to-tr from-[#D92B27]/5 via-transparent to-transparent rounded-full blur-3xl" />
-          <div className="absolute top-0 left-0 w-1 h-full bg-[#D92B27]" />
-          <div
-            className="absolute inset-0 opacity-[0.025]"
-            style={{
-              backgroundImage: 'radial-gradient(#0A1128 1px, transparent 1px)',
-              backgroundSize: '32px 32px',
-            }}
-          />
-        </div>
-
-        <div className="max-w-[1600px] mx-auto w-full relative z-10">
-
-          {/* Eyebrow badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-wrap items-center gap-3 mb-8"
-          >
-            <span className="p-2 rounded-full bg-[#D92B27]/10 text-[#D92B27] border border-[#D92B27]/20">
-              <Sparkles size={15} />
-            </span>
-            <p className="text-[#D92B27] font-black text-sm sm:text-base md:text-lg tracking-wide uppercase">
-              Youth Retreat 2026 &nbsp;&middot;&nbsp; Annual Gathering
-            </p>
-          </motion.div>
-
-          {/* Main headline */}
-          <div className="overflow-hidden mb-2">
-            <motion.h1
-              initial={{ y: '110%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
-              className="text-[#0A1128] uppercase leading-[0.82] font-black"
-              style={{ fontSize: 'clamp(48px, 10vw, 180px)', letterSpacing: '-0.02em' }}
-            >
-              Empowering
-            </motion.h1>
-          </div>
-          <div className="overflow-hidden mb-8 md:mb-12">
-            <motion.h1
-              initial={{ y: '110%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.15, duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
-              className="text-[#D92B27] uppercase leading-[0.82] font-black"
-              style={{ fontSize: 'clamp(48px, 10vw, 180px)', letterSpacing: '-0.02em' }}
-            >
-              Generations
-            </motion.h1>
-          </div>
-
-          <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-[#D92B27] leading-snug max-w-2xl mb-6">
-            Organized by S.A.Y Group
-          </p>
-
-          {/* Bottom bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.7 }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end border-t border-[#0A1128]/10 pt-8"
-          >
-            <div className="lg:col-span-7">
-              <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-[#0A1128]/60 leading-snug max-w-2xl">
-                A strategic one-day youth retreat designed to equip, empower, and inspire young leaders to live with purpose and strength.
-              </p>
-            </div>
-            <div className="lg:col-span-5 flex flex-col sm:flex-row items-start sm:items-center gap-5">
-              <Link
-                to="/register"
-                className="group inline-flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-[#D92B27] hover:bg-[#0A1128] text-white font-black uppercase tracking-widest text-sm transition-all duration-300 shadow-[0_8px_40px_rgba(217,43,39,0.3)] hover:shadow-[0_8px_40px_rgba(10,17,40,0.25)]"
-              >
-                <span>Register Now</span>
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <div className="flex items-center gap-2 text-xs font-bold text-[#0A1128]/40 uppercase tracking-widest">
-                <Calendar size={13} className="text-[#D92B27]" />
-                <span>Oct 02, 2026 &nbsp;&middot;&nbsp; Mumbai</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Year floating tag */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
-          className="absolute top-28 right-6 md:right-10 hidden lg:flex flex-col items-end gap-1"
-        >
-          <span className="text-[#D92B27] font-black uppercase tracking-[0.2em] text-[10px]">Annual Gathering</span>
-          <span
-            className="text-[#0A1128]/10 font-black leading-none select-none"
-            style={{ fontSize: 'clamp(60px, 9vw, 120px)' }}
-          >2026</span>
-        </motion.div>
+      {/* ══ HERO — Split layout banner with active slideshow ══════════════════ */}
+      <section className="relative w-full">
+        <ImageCarousel />
       </section>
 
-      <EventTimer />
+      {/* ══ Marquee ticker ══════════════════════════════ */}
+      <Marquee />
 
-      {/* ══════════════════════════════════════════════
-          TOPIC TICKER — Horizontal marquee strip
-      ══════════════════════════════════════════════ */}
-      <div className="relative overflow-hidden border-y border-[#0A1128]/10 py-4 md:py-5 bg-white">
-        <div className="animate-scroll flex gap-0 whitespace-nowrap">
-          {Array.from({ length: 2 }).flatMap((_, rep) =>
-            [
-              { label: 'Leadership Development', color: 'text-[#0A1128]' },
-              { label: 'Purpose & Calling', color: 'text-[#D92B27]' },
-              { label: 'Mental Health', color: 'text-[#0A1128]/50' },
-              { label: 'Community Building', color: 'text-[#D92B27]/70' },
-              { label: 'Apologetics', color: 'text-[#0A1128]' },
-              { label: 'Global Mission', color: 'text-[#D92B27]' },
-              { label: 'Worship & Prayer', color: 'text-[#0A1128]/50' },
-              { label: 'Faith in Action', color: 'text-[#D92B27]/70' },
-            ].map((item, i) => (
-              <span key={`${rep}-${i}`} className="flex items-center mr-6 sm:mr-8">
-                <span className={`font-black uppercase tracking-wide text-sm sm:text-base md:text-lg ${item.color}`}>
-                  {item.label}
+      {/* ══ Intro statement ════════════════════════════ */}
+      <section className="py-20 md:py-32 px-6 sm:px-10 md:px-16 noise bg-white">
+        <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Left: massive tagline */}
+          <div className="lg:col-span-7">
+            <Reveal direction="left">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="w-8 h-[2px] bg-[#D92B27]" />
+                <span className="text-[#D92B27] font-black uppercase text-xs tracking-[0.25em]">
+                  Salvation Army Sion Corps
                 </span>
-                <span className="mx-4 sm:mx-6 w-1 h-1 rounded-full inline-block bg-[#D92B27]/30 shrink-0" />
-              </span>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════
-          WHEN & WHERE — Editorial venue + live map
-      ══════════════════════════════════════════════ */}
-      <section id="venue" className="bg-[#F8FAFC] py-16 md:py-20 lg:py-32 px-4 md:px-10">
-        <div className="max-w-[1600px] mx-auto">
-
-          {/* Section header */}
-          <Reveal className="mb-10 md:mb-14">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div>
-                <p className="text-[#D92B27] font-black uppercase tracking-[0.3em] text-xs flex items-center gap-2 mb-4">
-                  <span className="w-5 h-0.5 bg-[#D92B27]" />
-                  When &amp; Where
-                </p>
-                <h2
-                  className="text-[#0A1128] uppercase leading-[0.9] font-black"
-                  style={{ fontSize: 'clamp(36px, 6vw, 90px)', letterSpacing: '-0.02em' }}
-                >
-                  Location <span className="text-[#D92B27]">&amp;</span> Map
-                </h2>
               </div>
-              <a
-                href={mapUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 px-5 sm:px-7 py-3 sm:py-3.5 rounded-full border-2 border-[#0A1128] text-[#0A1128] hover:bg-[#0A1128] hover:text-white font-black uppercase text-xs tracking-widest transition-all duration-300 self-start md:self-auto"
+              <h2
+                className="font-bold uppercase leading-[0.88] tracking-tighter text-[#0A1128]"
+                style={{ fontSize: 'clamp(42px, 6.5vw, 96px)',fontFamily:"Unbounded" }}
               >
-                <Navigation size={14} />
-                <span>Get Directions</span>
-                <ExternalLink size={12} className="group-hover:rotate-12 transition-transform" />
-              </a>
-            </div>
-          </Reveal>
+                Over Five
+                <br />
+                <span className="text-[#D92B27]">Decades</span>
+                <br />
+                of Service
+              </h2>
+            </Reveal>
+          </div>
 
-          {/* Main venue card */}
-          <Reveal delay={0.12}>
-            <div className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-[0_4px_60px_rgba(10,17,40,0.06)]">
-              <div className="grid grid-cols-1 lg:grid-cols-2">
-
-                {/* LEFT — Venue info */}
-                <div className="p-6 sm:p-8 md:p-12 flex flex-col justify-between gap-8 md:gap-10 border-b lg:border-b-0 lg:border-r border-slate-100">
-
-                  <div>
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D92B27]/8 border border-[#D92B27]/20 mb-6">
-                      <MapPin size={12} className="text-[#D92B27]" />
-                      <span className="text-[#D92B27] font-black uppercase tracking-widest text-[10px]">Official Venue</span>
-                    </div>
-                    <h3
-                      className="text-[#0A1128] uppercase leading-[0.9] font-black mb-4"
-                      style={{ fontSize: 'clamp(24px, 4vw, 56px)', letterSpacing: '-0.02em' }}
-                    >
-                      Salvation Army Tamil Church Sion
-                    </h3>
-                    <p className="text-sm sm:text-base font-semibold text-[#0A1128]/50 flex items-start gap-2 leading-relaxed">
-                      <MapPin size={15} className="text-[#D92B27] mt-0.5 shrink-0" />
-                     6, First Floor, Plot No, 60 Feet Road, <br />
-                     Opposite Manav Seva Sangh, Sion East,<br />
-                      Sion, Mumbai, Maharashtra 400022
-                    </p>
-                  </div>
-
-                  {/* Date & Time cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-5 sm:p-6 rounded-2xl bg-[#FFE600] text-[#0A1128] relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-16 h-16 bg-[#0A1128]/5 rounded-bl-3xl" />
-                      <div className="flex items-center gap-2 mb-3">
-                        <Calendar className="w-4 h-4" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.25em]">Date</span>
-                      </div>
-                      <p className="font-black uppercase leading-tight text-lg sm:text-[22px]">
-                        Friday,<br />Oct 2, 2026
-                      </p>
-                    </div>
-                    <div className="p-5 sm:p-6 rounded-2xl bg-[#0A1128] text-white relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-bl-3xl" />
-                      <div className="flex items-center gap-2 mb-3">
-                        <Clock className="w-4 h-4 text-[#D92B27]" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/60">Time</span>
-                      </div>
-                      <p className="font-black uppercase leading-tight text-white text-lg sm:text-[22px]">
-                        9:00 AM &ndash;<br />6:00 PM
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Quick info pills */}
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { icon: <User size={11} />, text: 'Open to All Youth' },
-                      { icon: <Sparkles size={11} />, text: 'Free Entry' },
-                      { icon: <Globe size={11} />, text: 'Mumbai, India' },
-                    ].map((item) => (
-                      <div key={item.text} className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full bg-slate-100 text-[#0A1128] text-xs font-bold">
-                        <span className="text-[#D92B27]">{item.icon}</span>
-                        {item.text}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* RIGHT — Live embedded map */}
-                <div className="relative min-h-[300px] sm:min-h-[400px] lg:min-h-[560px] flex flex-col">
-                  <iframe
-                    title="Salvation Army Tamil Church Sion Location"
-                    src={embedMapUrl}
-                    className="w-full flex-1 min-h-[300px] sm:min-h-[400px] lg:min-h-full border-0"
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                  {/* Open in Maps overlay button */}
-                  <a
-                    href={mapUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="absolute bottom-4 right-4 z-20 group flex items-center gap-2 bg-white/90 backdrop-blur-sm border border-slate-200 text-[#0A1128] hover:bg-[#D92B27] hover:text-white hover:border-[#D92B27] rounded-full px-3 sm:px-4 py-2 sm:py-2.5 text-[10px] font-black uppercase tracking-widest shadow-lg transition-all duration-300"
-                  >
-                    <ExternalLink size={12} />
-                    <span>Open in Maps</span>
-                  </a>
-                </div>
-
-              </div>
-            </div>
-          </Reveal>
-
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          SPEAKERS — Bold editorial cards
-      ══════════════════════════════════════════════ */}
-      <section id="speakers" className="bg-white py-16 md:py-20 lg:py-32 px-4 md:px-10">
-        <div className="max-w-[1600px] mx-auto">
-
-          <Reveal className="mb-10 md:mb-14">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div>
-                <p className="text-[#D92B27] font-black uppercase tracking-[0.3em] text-xs mb-4 flex items-center gap-2">
-                  <span className="w-5 h-0.5 bg-[#D92B27]" />
-                  Retreat Speakers
-                </p>
-                <h2
-                  className="text-[#0A1128] uppercase leading-[0.88] font-black"
-                  style={{ fontSize: 'clamp(36px, 7vw, 100px)', letterSpacing: '-0.02em' }}
-                >
-                  Featured <span className="text-[#D92B27]">Speakers</span>
-                </h2>
-              </div>
-              <p className="text-sm md:text-base lg:text-lg font-medium text-[#0A1128]/50 max-w-xs">
-                Hear from inspiring leaders shaping the future of faith and youth movement.
+          {/* Right: short description + quick stats */}
+          <div className="lg:col-span-5">
+            <Reveal direction="right" delay={0.1}>
+              <p className="text-slate-500 text-base sm:text-lg leading-relaxed font-medium mb-10">
+                A community built on love, prayer, and radical generosity — rooted in Sion, Mumbai, serving families in Dharavi and beyond since 1976.
               </p>
-            </div>
-          </Reveal>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-            {/* Speaker 1 — Red card */}
-            <Reveal delay={0}>
-              <motion.div
-                whileHover={{ y: -8 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                className="bg-[#D92B27] text-white rounded-3xl p-6 sm:p-8 md:p-12 flex flex-col justify-between min-h-[320px] sm:min-h-[420px] shadow-[0_20px_60px_rgba(217,43,39,0.22)] relative overflow-hidden"
-              >
-                <span
-                  className="absolute top-6 right-8 font-black opacity-10 text-white select-none"
-                  style={{ fontSize: '80px', lineHeight: 1 }}
-                >01</span>
-                <div>
-                  <div className="flex items-center gap-3 mb-6 sm:mb-8">
-                    <div className="p-2 sm:p-3 rounded-2xl bg-white/15 text-white border border-white/20">
-                      <User className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </div>
-                    <span className="font-black uppercase tracking-widest text-[10px] px-3 py-1.5 bg-white/15 text-white rounded-full border border-white/20">
-                      Keynote Speaker
-                    </span>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { stat: '80+', label: 'Years of Mission' },
+                  { stat: '6',   label: 'Active Ministries' },
+                  { stat: '2K+', label: 'Lives Impacted' },
+                  { stat: '52',  label: 'Sundays a Year' },
+                ].map((s, i) => (
+                  <div key={i} className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                    <p className="text-3xl sm:text-4xl font-black text-[#D92B27] leading-none">{s.stat}</p>
+                    <p className="text-xs font-black uppercase tracking-wider text-slate-500 mt-1">{s.label}</p>
                   </div>
-                  <h3 className="text-white uppercase leading-[0.9] mb-4 font-black" style={{ fontSize: 'clamp(28px, 4vw, 60px)' }}>
-                    Pastor Guest Speaker
-                  </h3>
-                  <p className="text-white/75 text-sm sm:text-base font-semibold">
-                    Anointed Keynote &amp; Spiritual Message
-                  </p>
-                </div>
-                <div className="pt-6 border-t border-white/20 flex items-center justify-between mt-6 sm:mt-0">
-                  <span className="font-extrabold uppercase tracking-wider text-xs text-white/70">Special Ministry Session</span>
-                  <div className="p-2 sm:p-2.5 rounded-full bg-white/15">
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </div>
-              </motion.div>
+                ))}
+              </div>
             </Reveal>
-
-            {/* Speaker 2 — Navy card */}
-            <Reveal delay={0.12}>
-              <motion.div
-                whileHover={{ y: -8 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                className="bg-[#0A1128] text-white rounded-3xl p-6 sm:p-8 md:p-12 flex flex-col justify-between min-h-[320px] sm:min-h-[420px] shadow-[0_20px_60px_rgba(10,17,40,0.15)] relative overflow-hidden"
-              >
-                <span
-                  className="absolute top-6 right-8 font-black opacity-10 text-white select-none"
-                  style={{ fontSize: '80px', lineHeight: 1 }}
-                >02</span>
-                <div>
-                  <div className="flex items-center gap-3 mb-6 sm:mb-8">
-                    <div className="p-2 sm:p-3 rounded-2xl bg-[#D92B27]/20 text-[#D92B27] border border-[#D92B27]/30">
-                      <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </div>
-                    <span className="font-black uppercase tracking-widest text-[10px] px-3 py-1.5 bg-white/10 text-white/80 rounded-full border border-white/10">
-                      Corps Officers
-                    </span>
-                  </div>
-                  <h3 className="text-white uppercase leading-[0.9] mb-4 font-black" style={{ fontSize: 'clamp(22px, 3.5vw, 50px)' }}>
-                    Capt Jeberson Paul &amp; Capt Muthuselvi Jeberson
-                  </h3>
-                  <p className="text-white/50 text-sm sm:text-base font-semibold">
-                    Corps Officers &amp; Youth Pastoral Leadership
-                  </p>
-                </div>
-                <div className="pt-6 border-t border-white/10 flex items-center justify-between mt-6 sm:mt-0">
-                  <span className="font-extrabold uppercase tracking-wider text-xs text-white/40">Hosts &amp; Pastoral Care</span>
-                  <div className="p-2 sm:p-2.5 rounded-full bg-[#D92B27]/20">
-                    <ChevronRight className="w-4 h-4 text-[#D92B27]" />
-                  </div>
-                </div>
-              </motion.div>
-            </Reveal>
-
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          CONTACT — Full section
-      ══════════════════════════════════════════════ */}
-      <section id="contact" className="bg-white py-16 md:py-20 lg:py-24 xl:py-36 px-4 md:px-10">
+      {/* ══ Service Timings ═══════════════════════════ */}
+      <section id="service-timings" className="py-20 md:py-32 bg-[#F8FAFC] px-6 sm:px-10 md:px-16 border-y border-slate-200 noise">
         <div className="max-w-[1600px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 lg:gap-20 items-start">
-
-            {/* Left sticky heading */}
-            <div className="lg:col-span-5 lg:sticky lg:top-28">
-              <Reveal>
-                <p className="text-[#D92B27] font-black uppercase tracking-[0.3em] text-xs mb-5 flex items-center gap-2">
-                  <span className="w-5 h-0.5 bg-[#D92B27] inline-block" />
-                  Get In Touch
-                </p>
-
-                <h2
-                  className="text-[#0A1128] uppercase leading-[0.88] font-black mb-6"
-                  style={{
-                    fontSize: 'clamp(40px, 7vw, 100px)',
-                    letterSpacing: '-0.02em',
-                  }}
-                >
-                  Let&apos;s<br />
-                  <span className="text-[#D92B27]">Connect</span>
-                </h2>
-
-                <p className="text-base sm:text-lg text-[#0A1128]/55 leading-relaxed font-medium max-w-md">
-                  Have a question about the retreat, registration, or anything
-                  else? We&apos;d love to hear from you. Reach out to us and
-                  we&apos;ll be happy to help.
-                </p>
-              </Reveal>
+          <Reveal className="mb-14 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <p className="text-[#D92B27] font-black uppercase tracking-[0.25em] text-xs mb-3 flex items-center gap-2">
+                <span className="w-5 h-[1.5px] bg-[#D92B27]" />
+                Weekly Schedule
+              </p>
+              <h2
+                className="font-bold uppercase leading-[0.9] tracking-tighter text-[#0A1128]"
+                style={{ fontSize: 'clamp(30px, 5vw, 72px)',fontFamily:"Unbounded"  }}
+              >
+                Worship<br />Timings
+              </h2>
             </div>
-
-            {/* Right: Contact details */}
-            <div className="lg:col-span-7">
-              <Reveal delay={0.1}>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                  {/* Email */}
-                  <a
-                    href="mailto:your@email.com"
-                    className="group bg-[#0A1128] rounded-3xl p-6 sm:p-7 md:p-8 text-white hover:-translate-y-1 transition-all duration-300"
-                  >
-                    <div className="flex items-start justify-between mb-8 sm:mb-12">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#FFE600] flex items-center justify-center text-[#0A1128]">
-                        <Mail size={18} className="sm:w-5 sm:h-5" />
-                      </div>
-                      <ArrowUpRight
-                        size={18}
-                        className="text-white/40 group-hover:text-[#FFE600] group-hover:translate-x-1 group-hover:-translate-y-1 transition-all"
-                      />
-                    </div>
-
-                    <p className="text-white/40 font-black uppercase tracking-[0.2em] text-[10px] sm:text-xs mb-2">
-                      Email Us
-                    </p>
-
-                    <p className="text-base sm:text-lg md:text-xl font-black break-all">
-                      tsasionchurch76@gmail.com
-                    </p>
-                  </a>
-
-                  {/* Phone */}
-                  <a
-                    href="tel:+919999999999"
-                    className="group bg-[#D92B27] rounded-3xl p-6 sm:p-7 md:p-8 text-white hover:-translate-y-1 transition-all duration-300"
-                  >
-                    <div className="flex items-start justify-between mb-8 sm:mb-12">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#FFE600] flex items-center justify-center text-[#0A1128]">
-                        <Phone size={18} className="sm:w-5 sm:h-5" />
-                      </div>
-                      <ArrowUpRight
-                        size={18}
-                        className="text-white/50 group-hover:text-[#FFE600] group-hover:translate-x-1 group-hover:-translate-y-1 transition-all"
-                      />
-                    </div>
-
-                    <p className="text-white/60 font-black uppercase tracking-[0.2em] text-[10px] sm:text-xs mb-2">
-                      Call Us
-                    </p>
-
-                    <p className="text-base sm:text-lg md:text-xl font-black">
-                      +91 96002 08400
-                    </p>
-                    <p className="text-base sm:text-lg md:text-xl font-black">
-                      +91 93243 42127
-                    </p>
-                    <p className="text-base sm:text-lg md:text-xl font-black">
-                      +91 93232 45509
-                    </p>
-                  </a>
-
-                </div>
-
-                {/* Bottom contact note */}
-                <div className="mt-6 sm:mt-8 border-l-4 border-[#FFE600] pl-4 sm:pl-5">
-                  <p className="text-base sm:text-lg md:text-xl text-[#0A1128]/45 leading-relaxed font-medium">
-                    We&apos;re here to help. Whether you&apos;re looking for
-                    information about the retreat, registration, accommodation,
-                    or anything else, feel free to reach out.
-                  </p>
-                </div>
-
-                {/* Optional social/contact */}
-                <div className="mt-6 sm:mt-8 flex flex-wrap gap-3">
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-full border-2 border-[#0A1128]/10 hover:border-[#0A1128] text-[#0A1128] font-black uppercase tracking-widest text-[10px] sm:text-xs transition-colors"
-                  >
-                    Instagram
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-full border-2 border-[#0A1128]/10 hover:border-[#0A1128] text-[#0A1128] font-black uppercase tracking-widest text-[10px] sm:text-xs transition-colors"
-                  >
-                    Facebook
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-full border-2 border-[#0A1128]/10 hover:border-[#0A1128] text-[#0A1128] font-black uppercase tracking-widest text-[10px] sm:text-xs transition-colors"
-                  >
-                    WhatsApp
-                  </a>
-                </div>
-
-              </Reveal>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          DARK TICKER — Inverted marquee
-      ══════════════════════════════════════════════ */}
-      <div className="relative overflow-hidden border-y border-[#0A1128]/80 py-4 md:py-5 bg-[#0A1128]">
-        <div className="animate-scroll flex gap-0 whitespace-nowrap" style={{ animationDirection: 'reverse', animationDuration: '25s' }}>
-          {Array.from({ length: 2 }).flatMap((_, rep) =>
-            ['Leadership Development', 'Purpose & Calling', 'Mental Health', 'Community Building', 'Apologetics', 'Global Mission', 'Worship & Prayer', 'Faith in Action'].map((t, i) => (
-              <span key={`${rep}-${i}`} className="flex items-center mr-6 sm:mr-8">
-                <span className={`font-black uppercase tracking-wide text-sm sm:text-base md:text-lg ${i % 3 === 0 ? 'text-[#D92B27]' : i % 3 === 1 ? 'text-white/60' : 'text-[#FFE600]'}`}>
-                  {t}
-                </span>
-                <span className="mx-4 sm:mx-6 w-1 h-1 rounded-full inline-block bg-white/20 shrink-0" />
-              </span>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════
-          PARTICIPATING CORPS — Full-bleed navy
-      ══════════════════════════════════════════════ */}
-      <section className="relative bg-[#0A1128] px-4 md:px-10 py-16 md:py-20 lg:py-36 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-          <span
-            className="font-black uppercase text-center leading-none text-white opacity-[0.025]"
-            style={{ fontSize: 'clamp(50px, 15vw, 200px)' }}
-          >
-            TOGETHER
-          </span>
-        </div>
-
-        <div className="relative z-10 max-w-[1600px] mx-auto">
-          <Reveal>
-            <p className="text-[#D92B27] font-black uppercase tracking-[0.3em] text-xs mb-5 flex items-center gap-2">
-              <span className="w-5 h-0.5 bg-[#D92B27]" />
-              Participating Corps
-            </p>
-            <h2
-              className="text-white uppercase leading-[0.88] font-black mb-10 md:mb-14"
-              style={{ fontSize: 'clamp(36px, 7vw, 100px)', letterSpacing: '-0.02em' }}
+            <Link
+              to="/ministries"
+              className="group inline-flex items-center gap-2 px-6 py-3 rounded-full border border-slate-300 hover:border-[#0A1128] text-slate-600 hover:text-[#0A1128] font-black uppercase text-[10px] tracking-widest transition-all bg-white"
             >
-              We love<br />
-              <span className="text-[#FFE600]">Collaborating</span>
-            </h2>
+              All Ministries <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+            </Link>
           </Reveal>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-slate-200">
             {[
-              'Sion Tamil Corps', 'Mira Road Corps', 'Sion Home', 'Ambernath Corps',
-              'Badlapur Corps', 'Bhandup Corps', 'Matunga Corps', 'Wadala Corps',
-            ].map((church, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.07, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                whileHover={{ y: -4 }}
-                className={`py-4 sm:py-5 px-4 sm:px-6 rounded-2xl text-center font-black uppercase tracking-wide text-xs sm:text-sm transition-colors duration-300 ${
-                  idx % 4 === 0 ? 'bg-[#D92B27] text-white' :
-                  idx % 4 === 1 ? 'bg-white/5 border border-white/10 text-white hover:bg-white/10' :
-                  idx % 4 === 2 ? 'bg-[#FFE600] text-[#0A1128]' :
-                  'bg-white/5 border border-white/10 text-white hover:bg-white/10'
-                }`}
-              >
-                {church}
-              </motion.div>
+              { icon: <Church size={20} />, badge: 'Sunday Morning', title: 'Holiness Meeting', time: '10:30 AM – 12:30 PM', desc: 'Primary congregational gathering with praise, Scripture, testimonies, and a message.', delay: 0 },
+              { icon: <Heart size={20} />, badge: 'Sunday Evening', title: 'Class Meeting', time: '6:00 PM – 7:30 PM', desc: 'Spiritual care and study tailored for youth and children to grow in faith.', delay: 0.07 },
+              { icon: <Users size={20} />, badge: 'Saturday Afternoon', title: 'Youth Fellowship', time: 'Saturdays 4:00 PM', desc: 'SAY prayer circles, Scripture reviews, and creative ministry activities for the youth.', delay: 0.14 },
+              { icon: <BookOpen size={20} />, badge: 'Wednesday Evening', title: 'Bible Study', time: 'Wednesdays 7:00 PM', desc: 'Interactive session equipping believers to apply Scripture principles in everyday life.', delay: 0.21 },
+            ].map((s, i) => (
+              <ServiceCard key={i} {...s} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          REGISTER CTA — Yellow full-bleed
-      ══════════════════════════════════════════════ */}
-      <section className="bg-[#FFE600] px-4 md:px-10 py-16 md:py-20 lg:py-28 relative overflow-hidden">
-        {/* Background Text */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-          <span
-            className="font-black uppercase opacity-[0.06] text-center leading-none text-[#0A1128]"
-            style={{ fontSize: 'clamp(60px, 16vw, 220px)' }}
-          >
-            DONATE
-          </span>
+      {/* ══ Featured Event (Retreat) ══════════════════ */}
+      <section className="py-20 md:py-32 bg-[#0A1128] px-6 sm:px-10 md:px-16 noise relative overflow-hidden">
+        {/* Grid texture */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] bg-[size:28px_28px] opacity-[0.025]" />
+
+        <div className="max-w-[1600px] mx-auto relative z-10">
+
+          {/* Section label */}
+          <Reveal>
+            <div className="flex items-center gap-3 mb-10">
+              <span className="w-8 h-[2px] bg-[#D92B27]" />
+              <span className="text-white/40 font-black uppercase text-xs tracking-[0.25em]">Special Event</span>
+              <span className="px-2.5 py-0.5 rounded-full bg-[#D92B27] text-white text-[9px] font-black uppercase tracking-wider animate-pulse">
+                Live Soon
+              </span>
+            </div>
+          </Reveal>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            {/* Left big title */}
+            <div className="lg:col-span-5">
+              <Reveal direction="left">
+                <h2
+                  className="font-bold uppercase leading-[0.88] tracking-tighter text-white mb-6"
+                  style={{ fontSize: 'clamp(40px, 6vw, 88px)' ,fontFamily:"Unbounded"}}
+                >
+                  Youth<br />
+                  <span className="text-[#FFE600]"    style={{ fontSize: 'clamp(40px, 6vw, 88px)' ,fontFamily:"Unbounded"}}>Retreat</span><br />
+                  <span className="text-[#D92B27]"    style={{ fontSize: 'clamp(40px, 6vw, 88px)' ,fontFamily:"Unbounded"}}>2026</span>
+                </h2>
+                <p className="text-white/50 text-sm sm:text-base leading-relaxed font-medium mb-8 max-w-sm">
+                  An annual gathering organised by the SAY Group, inviting youth from corps across Mumbai to grow in faith, worship, and community service.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Link
+                    to="/retreat"
+                    className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#D92B27] hover:bg-white text-white hover:text-[#0A1128] font-black uppercase text-[10px] tracking-widest transition-all duration-300"
+                  >
+                    Retreat Page <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 hover:border-white text-white/70 hover:text-white font-black uppercase text-[10px] tracking-widest transition-all duration-300"
+                  >
+                    Register Now
+                  </Link>
+                </div>
+              </Reveal>
+            </div>
+
+            {/* Right: countdown widget */}
+            <div className="lg:col-span-7">
+              <Reveal delay={0.1}>
+                <EventTimer compact />
+              </Reveal>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="relative z-10 max-w-[1600px] mx-auto">
-          {/* Heading */}
-          <div className="mb-10 md:mb-12">
-            <p className="text-[#D92B27] font-black uppercase tracking-[0.3em] text-xs mb-5 flex items-center gap-2">
-              <span className="w-5 h-0.5 bg-[#D92B27]" />
-              Support The Mission
+      {/* ══ Ministry highlight strip ══════════════════ */}
+      <section className="py-20 md:py-32 bg-white px-6 sm:px-10 md:px-16 border-b border-slate-200 noise">
+        <div className="max-w-[1600px] mx-auto">
+          <Reveal className="mb-14">
+            <p className="text-[#D92B27] font-black uppercase tracking-[0.25em] text-xs mb-3 flex items-center gap-2">
+              <span className="w-5 h-[1.5px] bg-[#D92B27]" />
+              Active Ministries
             </p>
-
             <h2
-              className="text-[#0A1128] uppercase leading-[0.88] font-black"
-              style={{
-                fontSize: 'clamp(40px, 8vw, 120px)',
-                letterSpacing: '-0.02em',
-              }}
+              className="font-bold uppercase leading-[0.9] tracking-tighter text-[#0A1128]"
+              style={{ fontSize: 'clamp(30px, 5vw, 72px)' ,fontFamily:"Unbounded"}}
             >
-              Donate <br />
+              Serving the<br />
+              <span className="text-[#D92B27]"  style={{ fontSize: 'clamp(30px, 5vw, 72px)' ,fontFamily:"Unbounded"}}>Community</span>
             </h2>
+          </Reveal>
 
-            <p className="mt-4 sm:mt-6 text-[#0A1128]/70 font-semibold text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed">
-              Your generous contribution helps us empower young people,
-              strengthen communities, and make this ministry possible.
-            </p>
+          {/* Horizontal scroll row of ministry chips */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { title: 'SAY Youth Group',       img: '/DSC_0004.webp', to: '/ministries/say-youth'            },
+              { title: 'Junior Home League',     img: '/DSC_0006.webp', to: '/ministries/junior-home-league'   },
+              { title: 'Home League — Women',    img: '/DSC_0811.webp', to: '/ministries/home-league'          },
+              { title: "Children's Ministries",  img: '/DSC_0003.webp', to: '/ministries/childrens-ministries' },
+              { title: 'Medical Fellowship',     img: '/choir.png',     to: '/ministries/medical-fellowship'   },
+              { title: 'Sunday Worship',         img: '/DSC_0002.webp', to: '/ministries/sunday-worship'       },
+            ].map((m, i) => (
+              <Reveal key={i} delay={i * 0.06}>
+                <Link
+                  to={m.to}
+                  className="group flex items-center gap-4 bg-white border border-slate-200 rounded-2xl p-4 hover:border-[#D92B27]/40 hover:shadow-[0_12px_30px_rgba(10,17,40,0.06)] transition-all duration-300"
+                >
+                  {/* Thumbnail — uncropped */}
+                  <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
+                    <img src={m.img} alt={m.title} className="max-w-full max-h-full object-contain" />
+                  </div>
+                  <span className="font-black uppercase text-xs tracking-tight text-[#0A1128] group-hover:text-[#D92B27] transition-colors leading-tight">
+                    {m.title}
+                  </span>
+                  <ArrowRight size={14} className="ml-auto text-slate-300 group-hover:text-[#D92B27] group-hover:translate-x-0.5 transition-all" />
+                </Link>
+              </Reveal>
+            ))}
           </div>
 
-          {/* Bank Details */}
-          <div className="grid md:grid-cols-2 gap-6 sm:gap-8 items-stretch">
-            <div className="bg-[#0A1128] rounded-3xl p-6 sm:p-7 md:p-10 text-white shadow-[0_15px_60px_rgba(10,17,40,0.2)]">
-              <p className="text-[#FFE600] font-black uppercase tracking-[0.25em] text-[10px] sm:text-xs mb-6 sm:mb-8">
-                Bank Details
+          <Reveal delay={0.3} className="mt-10 text-center">
+            <Link
+              to="/ministries"
+              className="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#0A1128] hover:bg-[#D92B27] text-white font-black uppercase text-xs tracking-widest transition-all duration-300 shadow-sm"
+            >
+              View All Ministries <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ══ Online Services (YouTube) ════════════════ */}
+      <section className="py-20 md:py-32 bg-[#F8FAFC] px-6 sm:px-10 md:px-16 border-b border-slate-200 noise">
+        <div className="max-w-[1600px] mx-auto">
+          <Reveal className="mb-14 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <p className="text-[#D92B27] font-black uppercase tracking-[0.25em] text-xs mb-3 flex items-center gap-2">
+                <span className="w-5 h-[1.5px] bg-[#D92B27]" />
+                Media Outreach
               </p>
-
-              <div className="space-y-4 sm:space-y-6">
-                <div>
-                  <p className="text-white/50 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">
-                    Account Name
-                  </p>
-                  <p className="text-lg sm:text-xl md:text-2xl font-black">
-                    YOUR ACCOUNT NAME
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-white/50 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">
-                    Account Number
-                  </p>
-                  <p className="text-lg sm:text-xl md:text-2xl font-black tracking-wider">
-                    XXXX XXXX XXXX
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-white/50 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">
-                    Bank Name
-                  </p>
-                  <p className="text-lg sm:text-xl md:text-2xl font-black">
-                    YOUR BANK NAME
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-white/50 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">
-                    IFSC Code
-                  </p>
-                  <p className="text-lg sm:text-xl md:text-2xl font-black tracking-wider">
-                    XXXXX000000
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-white/50 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-1">
-                    Branch
-                  </p>
-                  <p className="text-lg sm:text-xl md:text-2xl font-black">
-                    YOUR BRANCH
-                  </p>
-                </div>
-              </div>
+              <h2
+                className="font-bold uppercase leading-[0.9] tracking-tighter text-[#0A1128]"
+                style={{ fontSize: 'clamp(30px, 5vw, 72px)' ,fontFamily:"Unbounded"}}
+              >
+                Online<br />Services
+              </h2>
             </div>
+            <a
+              href="https://www.youtube.com/@SalvationArmyTamilCorpsSion"
+              target="_blank" rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 px-6 py-3 rounded-full border border-slate-300 hover:border-[#0A1128] text-slate-600 hover:text-[#0A1128] font-black uppercase text-[10px] tracking-widest transition-all bg-white"
+            >
+              <Video size={12} />
+              YouTube Channel
+              <ExternalLink size={10} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          </Reveal>
 
-            {/* Donation Message */}
-            <div className="bg-white/50 border-2 border-[#0A1128]/10 rounded-3xl p-6 sm:p-7 md:p-10 flex flex-col justify-between">
-              <div>
-                <p className="text-[#D92B27] font-black uppercase tracking-[0.25em] text-[10px] sm:text-xs mb-6">
-                  Every Contribution Matters
-                </p>
-
-                <h3 className="text-[#0A1128] font-black uppercase text-2xl sm:text-3xl md:text-5xl leading-[0.95]">
-                  Be Part Of
-                  <br />
-                  <span className="text-[#D92B27]">The Movement.</span>
-                </h3>
-
-                <p className="mt-4 sm:mt-6 text-[#0A1128]/65 font-semibold leading-relaxed max-w-lg text-sm sm:text-base">
-                  You can support the ministry by transferring your contribution
-                  directly to the bank account above. Thank you for partnering
-                  with us and investing in the next generation.
-                </p>
-              </div>
-
-              <div className="mt-8 sm:mt-10 pt-6 border-t border-[#0A1128]/10">
-                <p className="text-[#0A1128]/50 text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-2">
-                  Reference
-                </p>
-                <p className="text-[#0A1128] font-black text-base sm:text-lg">
-                  Youth Retreat 2026
-                </p>
-              </div>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {[
+              {
+                src:   'https://www.youtube.com/embed/IRuaizLfooc?si=O9W1fbqnCI20RCLQ',
+                title: 'Sunday Holiness Broadcast',
+                badge: 'Worship Service',
+                desc:  'Join in spirit with our congregation at TSA Tamil Sion for worship, prayer, and an encouraging sermon.',
+              },
+              {
+                src:   'https://www.youtube.com/embed/aNzT-lTzlGg?si=wkDGz6-gVD7sZtxR',
+                title: 'SAY Youth Gathering',
+                badge: 'Youth Ministry',
+                desc:  'Snippets and spiritual messages from our Saturday youth gatherings, praise sessions, and topic discussions.',
+              },
+            ].map((v, i) => (
+              <Reveal key={i} delay={i * 0.1}>
+                <div className="bg-white rounded-[28px] border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm sm:text-base font-black uppercase text-[#0A1128] tracking-tight">{v.title}</h3>
+                    <span className="text-[8px] font-black uppercase tracking-wider text-[#D92B27] bg-[#D92B27]/5 px-2.5 py-1 rounded-full">
+                      {v.badge}
+                    </span>
+                  </div>
+                  <div className="relative aspect-video rounded-2xl overflow-hidden bg-black border border-slate-100">
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src={v.src} title={v.title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  <p className="text-slate-500 text-xs font-semibold mt-4 leading-relaxed">{v.desc}</p>
+                </div>
+              </Reveal>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* ══ Location ════════════════════════════════ */}
+      <section className="py-20 md:py-32 bg-white px-6 sm:px-10 md:px-16 noise">
+        <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+
+          <div className="lg:col-span-4">
+            <Reveal>
+              <p className="text-[#D92B27] font-black uppercase tracking-[0.25em] text-xs mb-3 flex items-center gap-2">
+                <span className="w-5 h-[1.5px] bg-[#D92B27]" />
+                Visit Us
+              </p>
+              <h2
+                className="font-bold uppercase leading-[0.9] tracking-tighter text-[#0A1128] mb-8"
+                style={{ fontSize: 'clamp(30px, 5vw, 64px)' ,fontFamily:"Unbounded"}}
+              >
+                Church<br />Location
+              </h2>
+              <div className="space-y-5 mb-10">
+                {[
+                  { icon: <MapPin size={15} />, label: 'Address', text: 'Plot No. 6, First Floor, 60 Feet Road, Sion East, Mumbai 400022' },
+                  { icon: <Mail size={15} />,   label: 'Email',   text: 'info@salvationarmy.com', href: 'mailto:info@salvationarmy.com' },
+                  { icon: <Phone size={15} />,  label: 'Phone',   text: '(123) 456-7890',          href: 'tel:1234567890' },
+                ].map((c, i) => (
+                  <div key={i} className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-[#D92B27] shrink-0">
+                      {c.icon}
+                    </div>
+                    <div>
+                      <span className="block text-[9px] font-black uppercase tracking-widest text-slate-400">{c.label}</span>
+                      {c.href
+                        ? <a href={c.href} className="text-sm font-bold text-[#0A1128] hover:text-[#D92B27] transition-colors">{c.text}</a>
+                        : <p className="text-sm font-bold text-[#0A1128] leading-snug">{c.text}</p>
+                      }
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <a
+                href={mapUrl} target="_blank" rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0A1128] hover:bg-[#D92B27] text-white font-black uppercase text-[10px] tracking-widest transition-colors shadow-sm"
+              >
+                <ExternalLink size={11} />
+                Open Google Maps
+                <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+              </a>
+            </Reveal>
+          </div>
+
+          {/* Map frame */}
+          <div className="lg:col-span-8 relative rounded-3xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50"
+            style={{ minHeight: '400px', height: '500px' }}>
+            <iframe
+              title="TSA Sion Church Location"
+              src={embedMapUrl}
+              className="absolute inset-0 w-full h-full border-0"
+              allowFullScreen loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+
         </div>
       </section>
 

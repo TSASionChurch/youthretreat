@@ -26,7 +26,7 @@ export default function Confirmation() {
   })();
 
   return (
-    <div className="min-h-screen pt-24 pb-32 bg-[#F8FAFC] text-[#0A1128] flex flex-col items-center justify-center relative overflow-hidden px-4">
+    <div className="retreat-site min-h-screen pt-24 pb-32 bg-[#F8FAFC] text-[#0A1128] flex flex-col items-center justify-center relative overflow-hidden px-4">
       <motion.div 
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}

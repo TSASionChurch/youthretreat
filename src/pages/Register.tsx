@@ -288,7 +288,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 };
 
   return (
-    <div className="min-h-screen pt-24 sm:pt-32 pb-24 bg-[#F8FAFC] text-[#0A1128]">
+    <div className="retreat-site min-h-screen pt-24 sm:pt-32 pb-24 bg-[#F8FAFC] text-[#0A1128]">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 relative z-10">
 
         {/* TOP HEADER CARD */}
