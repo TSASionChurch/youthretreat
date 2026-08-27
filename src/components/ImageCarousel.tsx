@@ -28,7 +28,7 @@ const SLIDES: Slide[] = [
     ctaLink: '/history'
   },
   {
-    imgSrc: '/choir.png',
+    imgSrc: '/choir.webp',
     bgClass: 'bg-[#E3F2FD]', // Soft Blue
     titleColor: 'text-[#0D47A1]',
     btnClass: 'bg-[#0D47A1] hover:bg-[#D92B27] text-white',
@@ -50,7 +50,7 @@ const SLIDES: Slide[] = [
     ctaLink: '/retreat'
   },
   {
-    imgSrc: '/grp1.png',
+    imgSrc: '/grp1.webp',
     bgClass: 'bg-[#F5F5F5]', // Soft Slate/Grey
     titleColor: 'text-[#212121]',
     btnClass: 'bg-[#0A1128] hover:bg-[#D92B27] text-white',
@@ -143,16 +143,16 @@ export default function ImageCarousel() {
                   <button
                     onClick={prevSlide}
                     aria-label="Previous slide"
-                    className="w-9 h-9 rounded-full border border-slate-300 hover:border-slate-400 bg-white/70 hover:bg-white text-slate-600 flex items-center justify-center transition-colors"
+                    className="w-12 h-12 rounded-full border border-slate-300 hover:border-slate-400 bg-white/70 hover:bg-white text-slate-600 flex items-center justify-center transition-colors"
                   >
-                    <ArrowLeft size={14} className="stroke-[2.5]" />
+                    <ArrowLeft size={16} className="stroke-[2.5]" />
                   </button>
                   <button
                     onClick={nextSlide}
                     aria-label="Next slide"
-                    className="w-9 h-9 rounded-full border border-slate-300 hover:border-slate-400 bg-white/70 hover:bg-white text-slate-600 flex items-center justify-center transition-colors"
+                    className="w-12 h-12 rounded-full border border-slate-300 hover:border-slate-400 bg-white/70 hover:bg-white text-slate-600 flex items-center justify-center transition-colors"
                   >
-                    <ArrowRight size={14} className="stroke-[2.5]" />
+                    <ArrowRight size={16} className="stroke-[2.5]" />
                   </button>
                 </div>
               </div>
@@ -163,28 +163,25 @@ export default function ImageCarousel() {
         {/* Right Column - Slanted Image Frame */}
         <div className="lg:col-span-7 w-full flex items-center justify-center">
           <div className="w-full h-[240px] sm:h-[320px] md:h-[440px] bg-[#D92B27] transform -skew-x-12 overflow-hidden rounded-none border-4 border-white shadow-xl relative">
-            <div className="w-full h-full transform skew-x-12 relative flex items-center justify-center bg-slate-50">
-              
-              <AnimatePresence mode="wait">
+            {/* Persistent dark fill — prevents white flash between crossfades */}
+            <div className="w-full h-full transform skew-x-12 relative flex items-center justify-center bg-[#111]">
+
+              <AnimatePresence mode="sync">
                 <motion.div
                   key={active}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.6 }}
-                  className="absolute inset-0 flex items-center justify-center p-4 bg-slate-50"
+                  transition={{ duration: 0.7, ease: 'easeInOut' }}
+                  className="absolute inset-0 flex items-center justify-center p-4"
                 >
-                  {/* Blurred ambient backdrop */}
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center filter blur-xl opacity-[0.04] pointer-events-none scale-110"
-                    style={{ backgroundImage: `url(${slide.imgSrc})` }}
-                  />
-                  
                   {/* Uncropped image element */}
                   <img
                     src={slide.imgSrc}
                     alt={slide.title}
                     draggable={false}
+                    width="1920"
+                    height="1271"
                     className="max-w-full max-h-full object-contain relative z-10 rounded-none"
                   />
                 </motion.div>
@@ -205,10 +202,12 @@ export default function ImageCarousel() {
             key={idx}
             onClick={() => setActive(idx)}
             aria-label={`Go to slide ${idx + 1}`}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              idx === active ? 'w-8 bg-[#D92B27]' : 'w-2 bg-slate-300'
-            }`}
-          />
+            className="py-5 px-1.5 group cursor-pointer"
+          >
+            <div className={`h-2 rounded-full transition-all duration-300 ${
+              idx === active ? 'w-8 bg-[#D92B27]' : 'w-2 bg-slate-300 group-hover:bg-slate-400'
+            }`} />
+          </button>
         ))}
       </div>
 

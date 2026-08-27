@@ -34,6 +34,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <img
               src="/crest.png"
               alt="Salvation Army Crest Logo"
+              width="40"
+              height="40"
               className="w-10 h-10 object-contain group-hover:rotate-6 transition-transform duration-300"
             />
             <div className="flex flex-col">
@@ -89,7 +91,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             {/* Mobile hamburger */}
             <button
-              className="lg:hidden p-2 rounded-full text-[#0A1128] hover:bg-slate-100 transition-colors"
+              className="lg:hidden w-12 h-12 flex items-center justify-center rounded-full text-[#0A1128] hover:bg-slate-100 transition-colors"
               onClick={() => setMobileOpen((v) => !v)}
               aria-label="Toggle menu"
             >
@@ -187,7 +189,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className="w-10 h-10 rounded-full border border-slate-200 hover:border-[#D92B27] hover:text-[#D92B27] flex items-center justify-center transition-colors bg-white text-slate-500 shadow-sm"
+                    className="w-12 h-12 rounded-full border border-slate-200 hover:border-[#D92B27] hover:text-[#D92B27] flex items-center justify-center transition-colors bg-white text-slate-500 shadow-sm"
                   >
                     <Icon size={16} />
                   </a>

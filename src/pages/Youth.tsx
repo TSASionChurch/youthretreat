@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 
 const GALLERY = [
   { src: '/yr.jpg',        alt: 'Youth Group Retreat' },
-  { src: '/yg2.JPG',      alt: 'Youth Retreat Worship Session' },
-  { src: '/yg3.JPG',      alt: 'SAY Group Fellowship' },
+  { src: '/yg2.webp',      alt: 'Youth Retreat Worship Session' },
+  { src: '/yg3.webp',      alt: 'SAY Group Fellowship' },
   { src: '/DSC_0004.webp', alt: 'SAY Group Congregation' },
 ];
 
@@ -148,6 +148,8 @@ export default function Youth() {
                   <img
                     src={img.src}
                     alt={img.alt}
+                    width="1000"
+                    height="750"
                     className="max-w-full max-h-full object-contain relative z-10 group-hover:scale-[1.03] transition-transform duration-500"
                   />
                 </motion.div>

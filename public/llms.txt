@@ -1,0 +1,21 @@
+# Youth Retreat 2026 - TSA Tamil Church Sion
+
+This is the official portal for the Salvation Army Church Tamil Sion, located in Mumbai, India. It includes church history, information about active ministries, donation links, and registrations for the annual Youth Retreat 2026.
+
+## Main Navigation Pages
+- **Home**: [https://tsasion.netlify.app/](https://tsasion.netlify.app/)
+  Main landing page containing the scriptural quote, church welcome slider, active ministries grid, and latest updates.
+- **History**: [https://tsasion.netlify.app/history](https://tsasion.netlify.app/history)
+  Chronology of the church founded in Sion/Dharavi since 1940.
+- **Ministries**: [https://tsasion.netlify.app/ministries](https://tsasion.netlify.app/ministries)
+  A listing of active ministries, including SAY Youth, Junior Home League, Home League, Children's Ministry, Medical Fellowship, and Sunday Worship.
+- **Donate**: [https://tsasion.netlify.app/donate](https://tsasion.netlify.app/donate)
+  Support channels including UPI QR codes and bank transfer credentials.
+- **Contact**: [https://tsasion.netlify.app/contact](https://tsasion.netlify.app/contact)
+  Address details, email form, and social media links.
+
+## Youth Retreat 2026
+- **Retreat Details**: [https://tsasion.netlify.app/retreat](https://tsasion.netlify.app/retreat)
+  Event overview, theme, speakers, schedule, and venue details.
+- **Register**: [https://tsasion.netlify.app/register](https://tsasion.netlify.app/register)
+  Registration form for delegates to sign up, select t-shirt size, and generate a QR confirmation.

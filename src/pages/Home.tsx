@@ -285,7 +285,7 @@ export default function Home() {
               { title: 'Junior Home League',     img: '/DSC_0006.webp', to: '/ministries/junior-home-league'   },
               { title: 'Home League — Women',    img: '/DSC_0811.webp', to: '/ministries/home-league'          },
               { title: "Children's Ministries",  img: '/DSC_0003.webp', to: '/ministries/childrens-ministries' },
-              { title: 'Medical Fellowship',     img: '/choir.png',     to: '/ministries/medical-fellowship'   },
+              { title: 'Medical Fellowship',     img: '/choir.webp',     to: '/ministries/medical-fellowship'   },
               { title: 'Sunday Worship',         img: '/DSC_0002.webp', to: '/ministries/sunday-worship'       },
             ].map((m, i) => (
               <Reveal key={i} delay={i * 0.06}>
@@ -295,7 +295,7 @@ export default function Home() {
                 >
                   {/* Thumbnail — uncropped */}
                   <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
-                    <img src={m.img} alt={m.title} className="max-w-full max-h-full object-contain" />
+                    <img src={m.img} alt={m.title} width="56" height="56" className="max-w-full max-h-full object-contain" />
                   </div>
                   <span className="font-black uppercase text-xs tracking-tight text-[#0A1128] group-hover:text-[#D92B27] transition-colors leading-tight">
                     {m.title}

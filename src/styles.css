@@ -1,17 +1,4 @@
-/* ═══════════════════════════════════════════════════════
-   Add this into your global stylesheet (e.g. index.css).
-   Drop BasementGrotesque-Black_v1_202.otf into /public/fonts/
-   so the path below resolves — adjust the path if your
-   build serves fonts elsewhere.
-   ═══════════════════════════════════════════════════════ */
 
-@font-face {
-  font-family: 'Basement Grotesque';
-  src: url('/fonts/BasementGrotesque-Black_v1_202.otf') format('opentype');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
 
 /* ── Marquee ticker (used by TickerStrip) ───────────── */
 .marquee-track {

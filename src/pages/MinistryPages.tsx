@@ -90,7 +90,7 @@ function MinistryPageTemplate({
                 transition={{ delay: 0.2, duration: 0.7 }}
                 className="w-full max-w-sm aspect-square bg-slate-100 rounded-3xl overflow-hidden border border-slate-200 shadow-sm flex items-center justify-center p-4"
               >
-                <img src={heroImg} alt={title} className="max-w-full max-h-full object-contain rounded-2xl" />
+                <img src={heroImg} alt={title} width="1920" height="1271" className="max-w-full max-h-full object-contain rounded-2xl" />
               </motion.div>
             </div>
           </div>
@@ -162,7 +162,7 @@ function MinistryPageTemplate({
               {galleryImgs.map((src, i) => (
                 <Reveal key={i} delay={i * 0.06}>
                   <div className="aspect-video bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 flex items-center justify-center p-2">
-                    <img src={src} alt={`Gallery ${i + 1}`} className="max-w-full max-h-full object-contain rounded-xl" />
+                    <img src={src} alt={`Gallery ${i + 1}`} width="1920" height="1271" className="max-w-full max-h-full object-contain rounded-xl" />
                   </div>
                 </Reveal>
               ))}
@@ -227,7 +227,7 @@ export function SAYYouthPage() {
     subtitle="The Salvation Army Youth group (SAY) is a vibrant fellowship of young believers growing together in faith, service, and community — every Saturday and beyond."
     heroImg="/DSC_0004.webp"
     icon={<Users size={22} />}
-    galleryImgs={['/DSC_0004.webp', '/DSC_0005.webp', '/DSC_0001.webp']}
+    galleryImgs={['/DSC_0004.webp', '/DSC_0006.webp', '/DSC_0001.webp']}
     pillars={[
       { icon: <BookOpen size={18} />, title: 'Saturday Fellowships', desc: LOREM_SHORT },
       { icon: <Heart size={18} />,    title: 'Community Service',    desc: LOREM_SHORT },
@@ -301,9 +301,9 @@ export function MedicalFellowshipPage() {
     badge="Healthcare Ministry"
     title="Medical Fellowship"
     subtitle="Mobilizing healthcare professionals and volunteers within the corps to run medical checkup camps and health initiatives for those in need across Mumbai."
-    heroImg="/choir.png"
+    heroImg="/choir.webp"
     icon={<Shield size={22} />}
-    galleryImgs={['/choir.png', '/DSC_0002.webp']}
+    galleryImgs={['/choir.webp', '/DSC_0002.webp']}
     pillars={[
       { icon: <Shield size={18} />,   title: 'Medical Checkup Camps', desc: LOREM_SHORT },
       { icon: <Heart size={18} />,    title: 'Health Awareness',      desc: LOREM_SHORT },
@@ -322,7 +322,7 @@ export function SundayWorshipPage() {
     subtitle="Our weekly Holiness and worship services bringing the congregation together in praise, Scripture teaching, and corporate prayer every Sunday at 10:30 AM."
     heroImg="/DSC_0002.webp"
     icon={<BookOpen size={22} />}
-    galleryImgs={['/DSC_0002.webp', '/DSC_0005.webp', '/DSC_0004.webp']}
+    galleryImgs={['/DSC_0002.webp', '/DSC_0006.webp', '/DSC_0004.webp']}
     pillars={[
       { icon: <BookOpen size={18} />, title: 'Holiness Meeting',   desc: LOREM_SHORT },
       { icon: <Heart size={18} />,    title: 'Corporate Prayer',   desc: LOREM_SHORT },

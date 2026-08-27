@@ -44,6 +44,8 @@ function MinistryCard({
           <img
             src={imgSrc}
             alt={title}
+            width="1920"
+            height="1271"
             className="max-w-full max-h-full object-contain relative z-10 rounded-2xl group-hover:scale-102 transition-transform duration-500 ease-out"
           />
         </div>
@@ -104,7 +106,7 @@ export default function Ministries() {
       linkTo: "/ministries/childrens-ministries",
     },
     {
-      imgSrc: "/choir.png",
+      imgSrc: "/choir.webp",
       title: "Medical Fellowship",
       description: "Mobilizing healthcare professionals and volunteers within the corps to run medical checkup camps and health initiatives for those in need.",
       linkTo: "/ministries/medical-fellowship",
