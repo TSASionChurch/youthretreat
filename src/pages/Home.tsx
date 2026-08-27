@@ -3,10 +3,12 @@ import { motion, useInView } from 'motion/react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, Church, Users, BookOpen,
-  Video, MapPin, Mail, Phone, ExternalLink, Calendar, Heart, Sparkles
+  Video, MapPin, Mail, Phone, ExternalLink, Calendar, Heart, Sparkles,
+  Baby
 } from 'lucide-react';
 import EventTimer from '../components/EventTimer';
 import ImageCarousel from '../components/ImageCarousel';
+import YoutubeFacade from '../components/YoutubeFacade';
 
 /* ── Utility: scroll-triggered reveal ─────────────────── */
 function Reveal({
@@ -82,7 +84,7 @@ function ServiceCard({
           >
             {title}
           </h3>
-          <p className="text-[#D92B27] group-hover:text-[#FFE600] font-black text-xs uppercase tracking-wide mt-1.5 transition-colors duration-300">
+          <p className="text-[#D92B27] group-hover:text-[#FFE600] font-black text-xs uppercase tracking-wide mt-1.5 transition-colors duration-300" style={{ whiteSpace: 'pre-line' }}>
             {time}
           </p>
           <p className="text-slate-500 group-hover:text-slate-300 text-xs sm:text-sm mt-4 leading-relaxed font-semibold transition-colors duration-300">
@@ -148,9 +150,9 @@ export default function Home() {
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { stat: '80+', label: 'Years of Mission' },
+                  { stat: '90+', label: 'Years of Mission' },
                   { stat: '6',   label: 'Active Ministries' },
-                  { stat: '2K+', label: 'Lives Impacted' },
+                 
                   { stat: '52',  label: 'Sundays a Year' },
                 ].map((s, i) => (
                   <div key={i} className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
@@ -190,10 +192,10 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-slate-200">
             {[
-              { icon: <Church size={20} />, badge: 'Sunday Morning', title: 'Holiness Meeting', time: '10:30 AM – 12:30 PM', desc: 'Primary congregational gathering with praise, Scripture, testimonies, and a message.', delay: 0 },
-              { icon: <Heart size={20} />, badge: 'Sunday Evening', title: 'Class Meeting', time: '6:00 PM – 7:30 PM', desc: 'Spiritual care and study tailored for youth and children to grow in faith.', delay: 0.07 },
-              { icon: <Users size={20} />, badge: 'Saturday Afternoon', title: 'Youth Fellowship', time: 'Saturdays 4:00 PM', desc: 'SAY prayer circles, Scripture reviews, and creative ministry activities for the youth.', delay: 0.14 },
-              { icon: <BookOpen size={20} />, badge: 'Wednesday Evening', title: 'Bible Study', time: 'Wednesdays 7:00 PM', desc: 'Interactive session equipping believers to apply Scripture principles in everyday life.', delay: 0.21 },
+              { icon: <Church size={20} />, badge: 'Sunday Morning', title: 'Sunday Holiness Meeting ', time: '10:15 AM – 12:30 PM', desc: 'Primary congregational gathering with praise, Scripture, testimonies, and a message.', delay: 0 },
+              { icon: <Baby size={20} />, badge: 'Friday and Monday Afternoon', title: 'Women\'s Ministries', time: 'Friday Fasting Prayer: 11:30AM onwards\nMonday Cottage Meeting : 12:00 PM onwards', desc: 'Spiritual care and study tailored for youth and children to grow in faith.', delay: 0.07 },
+              { icon: <Users size={20} />, badge: 'Saturday Afternoon', title: 'Youth Fellowship', time: 'Saturday Prayer 9:00 PM', desc: 'SAY prayer circles, Scripture reviews, and creative ministry activities for the youth.', delay: 0.14 },
+              { icon: <BookOpen size={20} />, badge: 'Sunday Afternoon', title: 'Bible Study', time: 'Sunday 12:00 PM', desc: 'Interactive session equipping believers to apply Scripture principles in everyday life.', delay: 0.21 },
             ].map((s, i) => (
               <ServiceCard key={i} {...s} />
             ))}
@@ -281,12 +283,12 @@ export default function Home() {
           {/* Horizontal scroll row of ministry chips */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { title: 'SAY Youth Group',       img: '/DSC_0004.webp', to: '/ministries/say-youth'            },
-              { title: 'Junior Home League',     img: '/DSC_0006.webp', to: '/ministries/junior-home-league'   },
-              { title: 'Home League — Women',    img: '/DSC_0811.webp', to: '/ministries/home-league'          },
+              { title: 'Sunday Worship',         img: '/DSC_0002.webp', to: '/ministries/sunday-worship' },
+              { title: "Women's Ministries",     img: '/DSC_0811.webp', to: '/ministries/home-league' },
+              { title: 'Youth Fellowship',        img: '/DSC_0004.webp', to: '/ministries/say-youth' },
               { title: "Children's Ministries",  img: '/DSC_0003.webp', to: '/ministries/childrens-ministries' },
-              { title: 'Medical Fellowship',     img: '/choir.webp',     to: '/ministries/medical-fellowship'   },
-              { title: 'Sunday Worship',         img: '/DSC_0002.webp', to: '/ministries/sunday-worship'       },
+              { title: 'Media Ministry',         img: '/choir.webp',    to: '/ministries/medical-fellowship' },
+              { title: 'Medical Fellowship',      img: '/choir.webp',    to: '/ministries/medical-fellowship' },
             ].map((m, i) => (
               <Reveal key={i} delay={i * 0.06}>
                 <Link
@@ -295,7 +297,7 @@ export default function Home() {
                 >
                   {/* Thumbnail — uncropped */}
                   <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
-                    <img src={m.img} alt={m.title} width="56" height="56" className="max-w-full max-h-full object-contain" />
+                    <img src={m.img} alt={m.title} width="56" height="56" loading="lazy" decoding="async" className="max-w-full max-h-full object-contain" />
                   </div>
                   <span className="font-black uppercase text-xs tracking-tight text-[#0A1128] group-hover:text-[#D92B27] transition-colors leading-tight">
                     {m.title}
@@ -347,16 +349,16 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {[
               {
-                src:   'https://www.youtube.com/embed/IRuaizLfooc?si=O9W1fbqnCI20RCLQ',
-                title: 'Sunday Holiness Broadcast',
-                badge: 'Worship Service',
-                desc:  'Join in spirit with our congregation at TSA Tamil Sion for worship, prayer, and an encouraging sermon.',
+                videoId: 'IRuaizLfooc',
+                title:   'Sunday Holiness Broadcast',
+                badge:   'Worship Service',
+                desc:    'Join in spirit with our congregation at TSA Tamil Sion for worship, prayer, and an encouraging sermon.',
               },
               {
-                src:   'https://www.youtube.com/embed/aNzT-lTzlGg?si=wkDGz6-gVD7sZtxR',
-                title: 'SAY Youth Gathering',
-                badge: 'Youth Ministry',
-                desc:  'Snippets and spiritual messages from our Saturday youth gatherings, praise sessions, and topic discussions.',
+                videoId: 'aNzT-lTzlGg',
+                title:   'SAY Youth Gathering',
+                badge:   'Youth Ministry',
+                desc:    'Snippets and spiritual messages from our Saturday youth gatherings, praise sessions, and topic discussions.',
               },
             ].map((v, i) => (
               <Reveal key={i} delay={i * 0.1}>
@@ -367,14 +369,8 @@ export default function Home() {
                       {v.badge}
                     </span>
                   </div>
-                  <div className="relative aspect-video rounded-2xl overflow-hidden bg-black border border-slate-100">
-                    <iframe
-                      className="absolute inset-0 w-full h-full"
-                      src={v.src} title={v.title}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
+                  <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-900 border border-slate-100">
+                    <YoutubeFacade videoId={v.videoId} title={v.title} />
                   </div>
                   <p className="text-slate-500 text-xs font-semibold mt-4 leading-relaxed">{v.desc}</p>
                 </div>
@@ -438,7 +434,8 @@ export default function Home() {
               title="TSA Sion Church Location"
               src={embedMapUrl}
               className="absolute inset-0 w-full h-full border-0"
-              allowFullScreen loading="lazy"
+              allowFullScreen
+              loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
           </div>

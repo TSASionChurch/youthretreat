@@ -90,7 +90,7 @@ function MinistryPageTemplate({
                 transition={{ delay: 0.2, duration: 0.7 }}
                 className="w-full max-w-sm aspect-square bg-slate-100 rounded-3xl overflow-hidden border border-slate-200 shadow-sm flex items-center justify-center p-4"
               >
-                <img src={heroImg} alt={title} width="1920" height="1271" className="max-w-full max-h-full object-contain rounded-2xl" />
+                <img src={heroImg} alt={title} width="1920" height="1271" loading="lazy" decoding="async" className="max-w-full max-h-full object-contain rounded-2xl" />
               </motion.div>
             </div>
           </div>
@@ -162,7 +162,7 @@ function MinistryPageTemplate({
               {galleryImgs.map((src, i) => (
                 <Reveal key={i} delay={i * 0.06}>
                   <div className="aspect-video bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 flex items-center justify-center p-2">
-                    <img src={src} alt={`Gallery ${i + 1}`} width="1920" height="1271" className="max-w-full max-h-full object-contain rounded-xl" />
+                    <img src={src} alt={`Gallery ${i + 1}`} width="1920" height="1271" loading="lazy" decoding="async" className="max-w-full max-h-full object-contain rounded-xl" />
                   </div>
                 </Reveal>
               ))}

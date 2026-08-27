@@ -27,17 +27,7 @@ const SLIDES: Slide[] = [
     ctaText: 'Learn More',
     ctaLink: '/history'
   },
-  {
-    imgSrc: '/choir.webp',
-    bgClass: 'bg-[#E3F2FD]', // Soft Blue
-    titleColor: 'text-[#0D47A1]',
-    btnClass: 'bg-[#0D47A1] hover:bg-[#D92B27] text-white',
-    eyebrow: 'Choir Fellowship',
-    title: 'Praise &\nWorship',
-    description: 'The Sion Choir leads the congregation in harmonious, spirit-filled worship every Sunday service.',
-    ctaText: 'Our Ministries',
-    ctaLink: '/ministries'
-  },
+
   {
     imgSrc: '/yr.jpg',
     bgClass: 'bg-[#FFFDE7]', // Soft Yellow/Gold
@@ -48,17 +38,6 @@ const SLIDES: Slide[] = [
     description: 'Empowering the next generation of Christian leaders. Register now for our annual youth retreat!',
     ctaText: 'View Retreat',
     ctaLink: '/retreat'
-  },
-  {
-    imgSrc: '/grp1.webp',
-    bgClass: 'bg-[#F5F5F5]', // Soft Slate/Grey
-    titleColor: 'text-[#212121]',
-    btnClass: 'bg-[#0A1128] hover:bg-[#D92B27] text-white',
-    eyebrow: 'Mumbai Outreach',
-    title: 'United In\nFellowship',
-    description: 'We believe in sharing the love of God through active spiritual leadership and local community actions.',
-    ctaText: 'Contact Us',
-    ctaLink: '/contact'
   }
 ];
 

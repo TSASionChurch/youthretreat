@@ -12,7 +12,7 @@ const WORDS = [
   { text: "SION",       range: [76, 100] },
 ];
 
-const COUNTER_DURATION = 3500; // ms
+const COUNTER_DURATION = 1800; // ms
 
 export default function StaircasePreloader({ onComplete }: StaircasePreloaderProps) {
   const [percent, setPercent]     = useState(0);

@@ -150,6 +150,8 @@ export default function Youth() {
                     alt={img.alt}
                     width="1000"
                     height="750"
+                    loading="lazy"
+                    decoding="async"
                     className="max-w-full max-h-full object-contain relative z-10 group-hover:scale-[1.03] transition-transform duration-500"
                   />
                 </motion.div>

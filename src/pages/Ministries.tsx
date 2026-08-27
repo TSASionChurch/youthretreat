@@ -46,6 +46,8 @@ function MinistryCard({
             alt={title}
             width="1920"
             height="1271"
+            loading="lazy"
+            decoding="async"
             className="max-w-full max-h-full object-contain relative z-10 rounded-2xl group-hover:scale-102 transition-transform duration-500 ease-out"
           />
         </div>
