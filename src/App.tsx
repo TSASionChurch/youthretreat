@@ -1,6 +1,17 @@
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
+
+// Automatically scrolls to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 // ── Route-level code splitting ──────────────────────────────────────────────
 // Each page is loaded only when the user navigates to it.
@@ -40,6 +51,7 @@ function PageLoader() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Layout>
         <Suspense fallback={<PageLoader />}>
           <Routes>

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'motion/react';
 import { Link } from 'react-router-dom';
 import {
@@ -46,7 +46,7 @@ function Marquee() {
       <motion.div
         className="flex items-center whitespace-nowrap"
         animate={{ x: ['0%', '-50%'] }}
-        transition={{ repeat: Infinity, repeatType: 'loop', duration: 18, ease: 'linear' }}
+        transition={{ repeat: Infinity, repeatType: 'loop', duration: 36, ease: 'linear' }}
       >
         {doubled.map((w, i) => (
           <span key={i} className="inline-flex items-center gap-3 text-white font-black uppercase text-xs tracking-[0.25em] px-6">
@@ -106,6 +106,47 @@ export default function Home() {
   const embedMapUrl =
     'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30173.47732297911!2d72.8218741743164!3d19.033612000000005!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c92a7019f37d%3A0xbf05632e51e35ef6!2sSalvation%20Army%20Tamil%20Church%2C%20Women%20And%20Children%20Home!5e0!3m2!1sen!2sin!4v1728552474695!5m2!1sen!2sin';
 
+  const [youtubeVideos, setYoutubeVideos] = useState<Array<{ videoId: string; title: string; badge: string; desc: string }>>([
+    {
+      videoId: 'WMOoBwsbagA',
+      title: 'Half Night Prayer Service 28 August 2026',
+      badge: 'Latest Broadcast',
+      desc: 'Join in spirit with our congregation at TSA Tamil Sion for night prayer, worship, and an encouraging sermon.',
+    },
+    {
+      videoId: 'H-Z1bLaeMV8',
+      title: 'When You Stand for God, God Stands With You',
+      badge: 'Youth Outreach',
+      desc: 'Inspirational message and worship moments brought by the SAY Youth Group of TSA Sion Tamil Corps.',
+    },
+  ]);
+
+  useEffect(() => {
+    const rssFeedUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://www.youtube.com/feeds/videos.xml?channel_id=UC9KBf9YY5ahFbAxs3_u4aFA');
+    fetch(rssFeedUrl)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === 'ok' && Array.isArray(data.items) && data.items.length >= 2) {
+          const latestTwo = data.items.slice(0, 2).map((item: any, idx: number) => {
+            const rawId = item.guid ? item.guid.replace('yt:video:', '') : (item.link.includes('v=') ? item.link.split('v=')[1] : item.link.split('/').pop());
+            const videoId = rawId ? rawId.split('&')[0] : 'WMOoBwsbagA';
+            const cleanTitle = item.title.replace(/#\w+/g, '').trim();
+            const dateStr = item.pubDate ? new Date(item.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+            return {
+              videoId,
+              title: cleanTitle || item.title,
+              badge: idx === 0 ? 'Latest Broadcast' : 'Featured Video',
+              desc: dateStr ? `Published on ${dateStr} on TSA Sion Tamil Corps YouTube Channel.` : 'Streamed on TSA Sion Tamil Corps YouTube Channel.',
+            };
+          });
+          setYoutubeVideos(latestTwo);
+        }
+      })
+      .catch((err) => {
+        console.warn('YouTube RSS feed fallback utilized:', err);
+      });
+  }, []);
+
   return (
     <div className="w-full overflow-x-hidden bg-white text-[#0A1128]">
 
@@ -146,13 +187,12 @@ export default function Home() {
           <div className="lg:col-span-5">
             <Reveal direction="right" delay={0.1}>
               <p className="text-slate-500 text-base sm:text-lg leading-relaxed font-medium mb-10">
-                A community built on love, prayer, and radical generosity — rooted in Sion, Mumbai, serving families in Dharavi and beyond since 1976.
+                Rooted in faith and radical generosity, our corps has been a spiritual sanctuary in Sion for over 85 years, uplifting families across Mumbai through compassionate ministry and community leadership.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { stat: '90+', label: 'Years of Mission' },
+                  { stat: '85+', label: 'Years of Mission' },
                   { stat: '6',   label: 'Active Ministries' },
-                 
                   { stat: '52',  label: 'Sundays a Year' },
                 ].map((s, i) => (
                   <div key={i} className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
@@ -192,10 +232,38 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-slate-200">
             {[
-              { icon: <Church size={20} />, badge: 'Sunday Morning', title: 'Sunday Holiness Meeting ', time: '10:15 AM – 12:30 PM', desc: 'Primary congregational gathering with praise, Scripture, testimonies, and a message.', delay: 0 },
-              { icon: <Baby size={20} />, badge: 'Friday and Monday Afternoon', title: 'Women\'s Ministries', time: 'Friday Fasting Prayer: 11:30AM onwards\nMonday Cottage Meeting : 12:00 PM onwards', desc: 'Spiritual care and study tailored for youth and children to grow in faith.', delay: 0.07 },
-              { icon: <Users size={20} />, badge: 'Saturday Afternoon', title: 'Youth Fellowship', time: 'Saturday Prayer 9:00 PM', desc: 'SAY prayer circles, Scripture reviews, and creative ministry activities for the youth.', delay: 0.14 },
-              { icon: <BookOpen size={20} />, badge: 'Sunday Afternoon', title: 'Bible Study', time: 'Sunday 12:00 PM', desc: 'Interactive session equipping believers to apply Scripture principles in everyday life.', delay: 0.21 },
+              { 
+                icon: <Church size={20} />, 
+                badge: 'Sunday Morning', 
+                title: 'Sunday Holiness Meeting', 
+                time: '10:15 AM – 12:30 PM', 
+                desc: 'Primary congregational worship service with vibrant praise, scripture reading, testimonies, prayer, and an inspiring sermon.', 
+                delay: 0 
+              },
+              { 
+                icon: <Heart size={20} />, 
+                badge: 'Friday & Monday', 
+                title: "Women's Ministry", 
+                time: 'Friday Fasting Prayer: 11:00 AM\nMonday Cottage Meeting: 12:00 PM', 
+                desc: 'Dedicated prayer gatherings and home cottage fellowship interceding for families, the church, and our nation.', 
+                delay: 0.07 
+              },
+              { 
+                icon: <Sparkles size={20} />, 
+                badge: 'Saturday & Sunday', 
+                title: 'Youth Fellowship', 
+                time: 'Saturday Prayer: 9:00 PM\nSunday Fellowship: 12:45 PM', 
+                desc: 'SAY youth circles, evening prayer sessions, scripture studies, and creative fellowship empowering young leaders.', 
+                delay: 0.14 
+              },
+              { 
+                icon: <BookOpen size={20} />, 
+                badge: 'Sunday Afternoon', 
+                title: "Children's Ministry / Sunday School", 
+                time: 'Sunday 12:00 PM', 
+                desc: 'Nurturing young minds in biblical values, action songs, creative lessons, and Vacation Bible School (VBS).', 
+                delay: 0.21 
+              },
             ].map((s, i) => (
               <ServiceCard key={i} {...s} />
             ))}
@@ -347,20 +415,7 @@ export default function Home() {
           </Reveal>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {[
-              {
-                videoId: 'IRuaizLfooc',
-                title:   'Sunday Holiness Broadcast',
-                badge:   'Worship Service',
-                desc:    'Join in spirit with our congregation at TSA Tamil Sion for worship, prayer, and an encouraging sermon.',
-              },
-              {
-                videoId: 'aNzT-lTzlGg',
-                title:   'SAY Youth Gathering',
-                badge:   'Youth Ministry',
-                desc:    'Snippets and spiritual messages from our Saturday youth gatherings, praise sessions, and topic discussions.',
-              },
-            ].map((v, i) => (
+            {youtubeVideos.map((v, i) => (
               <Reveal key={i} delay={i * 0.1}>
                 <div className="bg-white rounded-[28px] border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-4">

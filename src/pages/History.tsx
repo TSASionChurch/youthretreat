@@ -64,8 +64,8 @@ export default function History() {
     {
       year: "1940",
       subtitle: "The Beginning",
-      title: "Ministry Starts in Dharavi Slums",
-      description: "Our ministry began its journey in the heart of the Dharavi slums, reaching out to the marginalized and down-trodden, providing spiritual guidance and social care.",
+      title: "Ministry Commences in Dharavi",
+      description: "Our ministry began its faithful journey in Dharavi, reaching out to local families, providing spiritual guidance, healthcare assistance, and compassionate community care.",
     },
     {
       year: "1960s",

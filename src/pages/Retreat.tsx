@@ -177,7 +177,7 @@ export default function Retreat() {
       </section>
 
       <EventTimer />
-
+            
       {/* ══════════════════════════════════════════════
           TOPIC TICKER — Horizontal marquee strip
       ══════════════════════════════════════════════ */}
@@ -575,7 +575,7 @@ export default function Retreat() {
           DARK TICKER — Inverted marquee
       ══════════════════════════════════════════════ */}
       <div className="relative overflow-hidden border-y border-[#0A1128]/80 py-4 md:py-5 bg-[#0A1128]">
-        <div className="animate-scroll flex gap-0 whitespace-nowrap" style={{ animationDirection: 'reverse', animationDuration: '25s' }}>
+        <div className="animate-scroll flex gap-0 whitespace-nowrap" style={{ animationDirection: 'reverse', animationDuration: '50s' }}>
           {Array.from({ length: 2 }).flatMap((_, rep) =>
             ['Leadership Development', 'Purpose & Calling', 'Mental Health', 'Community Building', 'Apologetics', 'Global Mission', 'Worship & Prayer', 'Faith in Action'].map((t, i) => (
               <span key={`${rep}-${i}`} className="flex items-center mr-6 sm:mr-8">
