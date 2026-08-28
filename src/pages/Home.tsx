@@ -40,15 +40,15 @@ function Reveal({
 /* ── Marquee strip ─────────────────────────────────────── */
 function Marquee() {
   const items = ['Faith', 'Hope', 'Fellowship', 'Service', 'Prayer', 'Community', 'Love', 'Grace'];
-  const doubled = [...items, ...items];
+  const quadrupled = [...items, ...items, ...items, ...items];
   return (
     <div className="overflow-hidden bg-[#D92B27] py-3.5 border-y border-[#b82320]">
       <motion.div
         className="flex items-center whitespace-nowrap"
         animate={{ x: ['0%', '-50%'] }}
-        transition={{ repeat: Infinity, repeatType: 'loop', duration: 36, ease: 'linear' }}
+        transition={{ repeat: Infinity, repeatType: 'loop', duration: 240, ease: 'linear' }}
       >
-        {doubled.map((w, i) => (
+        {quadrupled.map((w, i) => (
           <span key={i} className="inline-flex items-center gap-3 text-white font-black uppercase text-xs tracking-[0.25em] px-6">
             {w}
             <span className="text-white/40">✦</span>

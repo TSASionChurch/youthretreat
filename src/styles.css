@@ -4,11 +4,13 @@
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: marquee-scroll 60s linear infinite;
+  animation: marquee-scroll 240s linear infinite;
+  will-change: transform;
+  transform: translateZ(0);
 }
 @keyframes marquee-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-33.3333%); }
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-33.3333%, 0, 0); }
 }
 
 /* ── Fine paper grain, used behind hero + navy panels ── */

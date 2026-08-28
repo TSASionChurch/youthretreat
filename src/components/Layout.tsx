@@ -73,7 +73,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   : 'text-[#D92B27] hover:bg-[#D92B27]/5'
               }`}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D92B27] animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-[#D92B27]" />
               <span>Retreat 2026</span>
             </Link>
           </div>

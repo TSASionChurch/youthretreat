@@ -50,11 +50,13 @@ h1, h2, h3 {
 }
 
 @keyframes scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
 }
 
 .animate-scroll {
-  animation: scroll 60s linear infinite;
+  animation: scroll 240s linear infinite;
   width: max-content;
+  will-change: transform;
+  transform: translateZ(0);
 }
