@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Users, Heart, Star, Shield, BookOpen, ChevronRight } from 'lucide-react';
+import { ArrowRight, Users, Heart, Star, Shield, BookOpen, ChevronRight, Video } from 'lucide-react';
 
 function Reveal({ children, delay = 0, className = '', direction = 'up' }: {
   children: React.ReactNode; delay?: number; className?: string;
@@ -354,6 +354,31 @@ export function MedicalFellowshipPage() {
       { icon: <Star size={18} />,     title: 'Preventive Health Education', desc: 'Conducting awareness sessions on hygiene, disease prevention, nutrition, and wellness.' },
       { icon: <BookOpen size={18} />, title: 'Dedicated Sunday Meetings', desc: 'Monthly gatherings for prayer, professional encouragement, and outreach strategy.' },
       { icon: <Shield size={18} />,   title: 'Medicine Distribution & Aid', desc: 'Providing basic medicines, health consultations, and prayer support for patients in need.' },
+    ]}
+  />;
+}
+
+export function MediaMinistryPage() {
+  return <MinistryPageTemplate
+    badge="Media & Digital Outreach"
+    title="Media Ministry"
+    subtitle="A rapidly growing wing of our church dedicated to representing TSA Sion Tamil Corps across digital platforms, live-streaming services, and developing mobile apps to reach believers worldwide."
+    heroImg="/choir.webp"
+    icon={<Video size={22} />}
+    aboutText1="The Media Ministry is a rapidly growing wing of our church responsible for the digital representation of TSA Sion Tamil Corps across modern media platforms, ensuring God's Word reaches remote locations and homes around the world."
+    aboutText2="Sunday Services, Half Night Prayer Services, and Special Meetings are live streamed through our official YouTube and Facebook channels. We have also developed our own mobile application—The Salvation Army Hymns and Bible App—providing pocket-level access for believers with over 5,000+ downloads, especially across African and Middle Eastern nations."
+    aboutText3="Our media team constantly brainstorms and introduces creative initiatives to share the Gospel, notably our weekly 'One Minute Sermon' series—delivering God's Word in quick 60-second video reflections on the go. Believers can also support our media initiatives through donations to help expand our broadcasting capabilities."
+    visionText="To leverage digital media, live streams, and mobile app technology to proclaim the Gospel and connect believers across the globe with our church family."
+    joinText="If you have skills in videography, live streaming, video editing, sound engineering, app development, or graphic design, get in touch with our Media Team!"
+    ctaSubtitle="Support our media outreach or join our creative team to share God's Word worldwide."
+    galleryImgs={['/choir.webp', '/DSC_0002.webp', '/DSC_0004.webp']}
+    pillars={[
+      { icon: <Video size={18} />,     title: 'Live Service Streams', desc: 'Live broadcasting Sunday Services, Half Night Prayer, and Special Meetings on YouTube and Facebook.' },
+      { icon: <Shield size={18} />,    title: 'Hymns & Bible Mobile App', desc: 'Custom mobile app with 5,000+ downloads serving believers in Africa, the Middle East, and beyond.' },
+      { icon: <Star size={18} />,      title: 'One Minute Sermon Series', desc: 'Weekly short video devotionals sharing God\'s message in a bite-sized format for people on the go.' },
+      { icon: <BookOpen size={18} />,  title: 'Social Media Outreach', desc: 'Managing YouTube, Facebook, and Instagram channels to broadcast worship and engage the community.' },
+      { icon: <Heart size={18} />,     title: 'Sanctuary Audio & Sound', desc: 'Operating sound systems, microphones, and digital audio mixing for all church services and events.' },
+      { icon: <Users size={18} />,     title: 'Digital Innovations & Aid', desc: 'Upgrading broadcasting equipment and inviting donations to support our global digital outreach initiatives.' },
     ]}
   />;
 }

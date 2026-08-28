@@ -37,6 +37,7 @@ const JuniorHomeLeaguePage    = lazy(() => import('./pages/MinistryPages').then(
 const HomeLeaguePage          = lazy(() => import('./pages/MinistryPages').then(m => ({ default: m.HomeLeaguePage })));
 const ChildrensMinistriesPage = lazy(() => import('./pages/MinistryPages').then(m => ({ default: m.ChildrensMinistriesPage })));
 const MedicalFellowshipPage   = lazy(() => import('./pages/MinistryPages').then(m => ({ default: m.MedicalFellowshipPage })));
+const MediaMinistryPage       = lazy(() => import('./pages/MinistryPages').then(m => ({ default: m.MediaMinistryPage })));
 const SundayWorshipPage       = lazy(() => import('./pages/MinistryPages').then(m => ({ default: m.SundayWorshipPage })));
 
 // Minimal spinner shown while a lazy chunk is being fetched
@@ -66,6 +67,7 @@ export default function App() {
             <Route path="/ministries/junior-home-league"   element={<JuniorHomeLeaguePage />} />
             <Route path="/ministries/home-league"          element={<HomeLeaguePage />} />
             <Route path="/ministries/childrens-ministries" element={<ChildrensMinistriesPage />} />
+            <Route path="/ministries/media-ministry"       element={<MediaMinistryPage />} />
             <Route path="/ministries/medical-fellowship"   element={<MedicalFellowshipPage />} />
             <Route path="/ministries/sunday-worship"       element={<SundayWorshipPage />} />
 

@@ -109,6 +109,12 @@ export default function Ministries() {
     },
     {
       imgSrc: "/choir.webp",
+      title: "Media Ministry",
+      description: "Representing our church across digital platforms, live streaming services, developing our 5000+ downloaded Hymns app, and publishing weekly one-minute sermons.",
+      linkTo: "/ministries/media-ministry",
+    },
+    {
+      imgSrc: "/choir.webp",
       title: "Medical Fellowship",
       description: "Mobilizing healthcare professionals and volunteers within the corps to run medical checkup camps and health initiatives for those in need.",
       linkTo: "/ministries/medical-fellowship",

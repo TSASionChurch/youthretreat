@@ -355,7 +355,7 @@ export default function Home() {
               { title: "Women's Ministries",     img: '/DSC_0811.webp', to: '/ministries/home-league' },
               { title: 'Youth Fellowship',        img: '/DSC_0004.webp', to: '/ministries/say-youth' },
               { title: "Children's Ministries",  img: '/DSC_0003.webp', to: '/ministries/childrens-ministries' },
-              { title: 'Media Ministry',         img: '/choir.webp',    to: '/ministries/medical-fellowship' },
+              { title: 'Media Ministry',         img: '/choir.webp',    to: '/ministries/media-ministry' },
               { title: 'Medical Fellowship',      img: '/choir.webp',    to: '/ministries/medical-fellowship' },
             ].map((m, i) => (
               <Reveal key={i} delay={i * 0.06}>
@@ -387,7 +387,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ Online Services (YouTube) ════════════════ */}
+      {/* ══ Watch Our Services (YouTube Feed) ════════════════ */}
       <section className="py-20 md:py-32 bg-[#F8FAFC] px-6 sm:px-10 md:px-16 border-b border-slate-200 noise">
         <div className="max-w-[1600px] mx-auto">
           <Reveal className="mb-14 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -400,7 +400,7 @@ export default function Home() {
                 className="font-bold uppercase leading-[0.9] tracking-tighter text-[#0A1128]"
                 style={{ fontSize: 'clamp(30px, 5vw, 72px)' ,fontFamily:"Unbounded"}}
               >
-                Online<br />Services
+                Watch Our<br />Services
               </h2>
             </div>
             <a
