@@ -49,14 +49,37 @@ h1, h2, h3 {
   @apply bg-[#D92B27]/40 hover:bg-[#D92B27] rounded-full transition-colors;
 }
 
-@keyframes scroll {
+/* ── Marquee Tickers (Cross-browser GPU accelerated) ─────── */
+@keyframes marquee-left {
   0%   { transform: translate3d(0, 0, 0); }
   100% { transform: translate3d(-50%, 0, 0); }
 }
 
-.animate-scroll {
-  animation: scroll 240s linear infinite;
-  width: max-content;
+@keyframes marquee-right {
+  0%   { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@utility ticker-marquee-left {
+  display: flex !important;
+  width: max-content !important;
+  animation: marquee-left 180s linear infinite !important;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+@utility ticker-marquee-right {
+  display: flex !important;
+  width: max-content !important;
+  animation: marquee-right 180s linear infinite !important;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+@utility animate-scroll {
+  display: flex !important;
+  width: max-content !important;
+  animation: marquee-left 180s linear infinite !important;
   will-change: transform;
   transform: translateZ(0);
 }

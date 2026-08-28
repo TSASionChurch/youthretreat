@@ -182,8 +182,12 @@ export default function Retreat() {
           TOPIC TICKER — Horizontal marquee strip
       ══════════════════════════════════════════════ */}
       <div className="relative overflow-hidden border-y border-[#0A1128]/10 py-4 md:py-5 bg-white">
-        <div className="animate-scroll flex gap-0 whitespace-nowrap" style={{ animationDuration: '240s' }}>
-          {Array.from({ length: 4 }).flatMap((_, rep) =>
+        <motion.div
+          className="flex items-center whitespace-nowrap"
+          animate={{ x: ['0%', '-50%'] }}
+          transition={{ repeat: Infinity, repeatType: 'loop', duration: 120, ease: 'linear' }}
+        >
+          {Array.from({ length: 2 }).flatMap((_, rep) =>
             [
               { label: 'Leadership Development', color: 'text-[#0A1128]' },
               { label: 'Purpose & Calling', color: 'text-[#D92B27]' },
@@ -202,7 +206,7 @@ export default function Retreat() {
               </span>
             ))
           )}
-        </div>
+        </motion.div>
       </div>
 
       {/* ══════════════════════════════════════════════
@@ -575,8 +579,12 @@ export default function Retreat() {
           DARK TICKER — Inverted marquee
       ══════════════════════════════════════════════ */}
       <div className="relative overflow-hidden border-y border-[#0A1128]/80 py-4 md:py-5 bg-[#0A1128]">
-        <div className="animate-scroll flex gap-0 whitespace-nowrap" style={{ animationDirection: 'reverse', animationDuration: '240s' }}>
-          {Array.from({ length: 4 }).flatMap((_, rep) =>
+        <motion.div
+          className="flex items-center whitespace-nowrap"
+          animate={{ x: ['-50%', '0%'] }}
+          transition={{ repeat: Infinity, repeatType: 'loop', duration: 120, ease: 'linear' }}
+        >
+          {Array.from({ length: 2 }).flatMap((_, rep) =>
             ['Leadership Development', 'Purpose & Calling', 'Mental Health', 'Community Building', 'Apologetics', 'Global Mission', 'Worship & Prayer', 'Faith in Action'].map((t, i) => (
               <span key={`${rep}-${i}`} className="flex items-center mr-6 sm:mr-8">
                 <span className={`font-black uppercase tracking-wide text-sm sm:text-base md:text-lg ${i % 3 === 0 ? 'text-[#D92B27]' : i % 3 === 1 ? 'text-white/60' : 'text-[#FFE600]'}`}>
@@ -586,7 +594,7 @@ export default function Retreat() {
               </span>
             ))
           )}
-        </div>
+        </motion.div>
       </div>
 
       {/* ══════════════════════════════════════════════
