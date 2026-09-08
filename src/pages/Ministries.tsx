@@ -1,80 +1,65 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { Shield, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { media } from '../lib/assets';
 
 function MinistryCard({
-  imgSrc,
-  title,
-  description,
-  linkTo,
-  index,
+  imgSrc, title, badge, description, linkTo, index,
 }: {
-  imgSrc: string;
-  title: string;
-  description: string;
-  linkTo?: string;
-  index: number;
+  imgSrc: string; title: string; badge: string;
+  description: string; linkTo?: string; index: number; key?: React.Key;
 }) {
-  const CardWrapper = linkTo ? Link : 'div';
-  
+  const CardWrapper = linkTo ? Link : ('div' as any);
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.6, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.5, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
       className="h-full"
     >
       <CardWrapper
         to={linkTo || '#'}
-        className={`flex flex-col h-full bg-white border border-slate-200 rounded-3xl overflow-hidden hover:shadow-[0_20px_45px_rgba(10,17,40,0.05)] hover:border-slate-300 transition-all duration-500 group relative ${
-          linkTo ? 'cursor-pointer' : ''
-        }`}
+        className="flex flex-col h-full bg-white border border-slate-200 group hover:border-[#222d61]/30 transition-all duration-300 cursor-pointer"
       >
-        {/* Soft Hover Border Highlight */}
-        <div className="absolute inset-0 border border-transparent group-hover:border-[#D92B27]/40 rounded-3xl pointer-events-none transition-colors duration-500 z-20" />
-
-        {/* Padded Image Frame - Fully Uncropped display */}
-        <div className="relative aspect-[16/10] overflow-hidden w-full bg-slate-50 flex items-center justify-center p-3 border-b border-slate-100">
-          <div 
-            className="absolute inset-0 bg-cover bg-center filter blur-xl opacity-[0.07] select-none scale-105 pointer-events-none"
-            style={{ backgroundImage: `url(${imgSrc})` }}
-          />
+        {/* Image */}
+        <div className="relative aspect-[4/3] overflow-hidden bg-slate-50">
+          <span className="absolute top-3 left-3 z-10 font-tech text-[9px] font-bold text-slate-400 bg-white/90 px-2 py-1 tracking-widest uppercase">
+            [{String(index + 1).padStart(2, '0')}]
+          </span>
           <img
             src={imgSrc}
             alt={title}
-            width="1920"
-            height="1271"
             loading="lazy"
-            decoding="async"
-            className="max-w-full max-h-full object-contain relative z-10 rounded-2xl group-hover:scale-102 transition-transform duration-500 ease-out"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
           />
         </div>
 
-        {/* Content Details */}
-        <div className="p-6 flex-1 flex flex-col justify-between">
-          <div>
-            <h3 className="text-lg sm:text-xl font-black text-[#0A1128] uppercase tracking-tight group-hover:text-[#D92B27] transition-colors duration-300">
-              {title}
-            </h3>
-            <p className="text-slate-500 text-xs sm:text-sm mt-3 leading-relaxed font-semibold">
-              {description}
-            </p>
-          </div>
+        {/* Content */}
+        <div className="flex flex-col flex-1 p-6">
+          <span className="font-tech text-[9px] font-bold uppercase tracking-[0.2em] text-[#D92B27] block mb-2">
+            {badge}
+          </span>
+          <h3
+            className="font-khand font-bold text-[#222d61] leading-tight mb-2 group-hover:text-[#D92B27] transition-colors duration-300 uppercase"
+            style={{ fontSize: 'clamp(20px, 1.8vw, 26px)', letterSpacing: '0.01em' }}
+          >
+            {title}
+          </h3>
+          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal flex-1">
+            {description}
+          </p>
 
-          <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
-            <span className="font-extrabold uppercase text-[9px] tracking-wider text-slate-400">
-              Corps Ministry
-            </span>
-            
-            {linkTo && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase text-[#D92B27] tracking-wider">
-                <span>View Page</span>
-                <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
+          {linkTo && (
+            <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+              <span className="font-tech text-[9px] font-bold text-slate-400 uppercase tracking-wider">CORPS MINISTRY</span>
+              <span className="w-7 h-7 border border-slate-200 flex items-center justify-center text-[#222d61] group-hover:bg-[#222d61] group-hover:text-white group-hover:border-[#222d61] transition-all duration-300">
+                <ArrowRight size={12} />
               </span>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </CardWrapper>
     </motion.div>
@@ -82,110 +67,123 @@ function MinistryCard({
 }
 
 export default function Ministries() {
+  /* Exactly in the requested order:
+     1. SUNDAY HOLINESS MEETING
+     2. HOME LEAGUE
+     3. YOUTH FELLOWSHIP (renamed from SAY GROUP)
+     4. JUNIOR HOME LEAGUE
+     5. CHILDREN'S MINISTRIES
+     6. MEDIA MINISTRY
+     7. MEDICAL FELLOWSHIP
+  */
   const ministriesData = [
     {
-      imgSrc: "/DSC_0004.webp",
-      title: "SAY Group (Youth)",
-      description: "Our dedicated Salvation Army Youth Group focusing on spiritual growth, Saturday prayer sessions, Christmas nativity planning, and medical camps.",
-      linkTo: "/ministries/say-youth",
+      imgSrc: media('/DSC_0002.webp'),
+      badge: 'SUNDAY WORSHIP',
+      title: 'SUNDAY HOLINESS MEETING',
+      description:
+        'Our weekly Holiness Meeting (10:15 AM – 12:30 PM) brings the congregation together in vibrant Tamil praise, scripture reading, testimony, and biblical preaching.',
+      linkTo: '/ministries/sunday-worship',
     },
     {
-      imgSrc: "/DSC_0006.webp",
-      title: "Junior Home League",
-      description: "Nurturing young girls in faith, life skills, fellowship, and service, helping them build a strong spiritual and ethical foundation.",
-      linkTo: "/ministries/junior-home-league",
+      imgSrc: media('/DSC_0811.webp'),
+      badge: "WOMEN'S MINISTRY",
+      title: 'HOME LEAGUE',
+      description:
+        "A cornerstone ministry for married women focusing on Friday Fasting Prayer (11:00 AM), Monday Cottage Meetings (12:00 PM), and bi-monthly fellowship gatherings.",
+      linkTo: '/ministries/home-league',
     },
     {
-      imgSrc: "/DSC_0811.webp",
-      title: "Home League (Women)",
-      description: "A vital women's ministry focused on fellowship, community outreach, and mutual support, helping ladies make an impact in their homes and neighborhood.",
-      linkTo: "/ministries/home-league",
+      imgSrc: media('/DSC_0004.webp'),
+      badge: 'YOUTH FELLOWSHIP',
+      title: 'YOUTH FELLOWSHIP',
+      description:
+        'Formed as our youth fellowship (SAY Group), our youth meet every Saturday (9 PM) and Sunday (12:45 PM) for prayer, Bible study, Christmas nativity crib planning, and free medical camps.',
+      linkTo: '/ministries/say-youth',
     },
     {
-      imgSrc: "/DSC_0003.webp",
-      title: "Children's Ministries",
-      description: "Providing a fun, engaging, and safe environment for children during Sunday school, fostering early faith and learning bible values.",
-      linkTo: "/ministries/childrens-ministries",
+      imgSrc: media('/DSC_0006.webp'),
+      badge: 'YOUNG WOMEN',
+      title: 'JUNIOR HOME LEAGUE',
+      description:
+        'Nurturing young unmarried women soldiers in spiritual depth, moral integrity, fellowship, and Christian service — meeting twice monthly after Sunday worship.',
+      linkTo: '/ministries/junior-home-league',
     },
     {
-      imgSrc: "/choir.webp",
-      title: "Media Ministry",
-      description: "Representing our church across digital platforms, live streaming services, developing our 5000+ downloaded Hymns app, and publishing weekly one-minute sermons.",
-      linkTo: "/ministries/media-ministry",
+      imgSrc: media('/DSC_0003.webp'),
+      badge: "CHILDREN'S CHURCH",
+      title: "CHILDREN'S MINISTRIES",
+      description:
+        'Providing a vibrant, safe environment for children every Sunday at 12:00 PM — action songs, memory verses, creative crafts, and our annual week-long Vacation Bible School (VBS).',
+      linkTo: '/ministries/childrens-ministries',
     },
     {
-      imgSrc: "/choir.webp",
-      title: "Medical Fellowship",
-      description: "Mobilizing healthcare professionals and volunteers within the corps to run medical checkup camps and health initiatives for those in need.",
-      linkTo: "/ministries/medical-fellowship",
+      imgSrc: media('/choir.webp'),
+      badge: 'DIGITAL OUTREACH',
+      title: 'MEDIA MINISTRY',
+      description:
+        'Live streaming services to YouTube & Facebook, developing the Salvation Army Hymns & Bible App (5,000+ downloads), and publishing weekly "One Minute Sermon" devotionals.',
+      linkTo: '/ministries/media-ministry',
     },
     {
-      imgSrc: "/DSC_0002.webp",
-      title: "Sunday Worship Services",
-      description: "Our weekly Holiness and worship services bringing the congregation together in praise, Scripture teaching, and corporate prayer.",
-      linkTo: "/ministries/sunday-worship",
+      imgSrc: media('/choir.webp'),
+      badge: 'HEALTHCARE',
+      title: 'MEDICAL FELLOWSHIP',
+      description:
+        'Mobilising doctors, nurses, and healthcare volunteers to conduct free medical checkup camps, diagnostic screenings, and medicine distribution across Sion and Dharavi.',
+      linkTo: '/ministries/medical-fellowship',
     },
   ];
 
   return (
-    <div className="w-full bg-[#F8FAFC] min-h-screen text-[#0A1128] noise pb-24">
-      {/* Header section */}
-      <section className="relative bg-white pt-24 pb-16 px-4 md:px-10 border-b border-slate-200 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-[#D92B27]/3 rounded-full blur-3xl" />
-        </div>
+    <div className="w-full bg-white min-h-screen text-[#222d61]">
 
-        <div className="max-w-[1600px] mx-auto w-full relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-2 mb-4"
-          >
-            <Shield size={14} className="text-[#D92B27]" />
-            <span className="text-[#D92B27] font-black uppercase tracking-[0.25em] text-xs">Our Work</span>
-          </motion.div>
-
-          <div className="overflow-hidden mb-2">
-            <motion.h1
-              initial={{ y: '110%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[#0A1128] uppercase leading-none font-black"
-              style={{ fontSize: 'clamp(36px, 8vw, 100px)', letterSpacing: '-0.02em' }}
-            >
-              Ministries
-            </motion.h1>
+      {/* ── Compact Header ───────────────────────────────────── */}
+      <section className="pt-16 pb-8 px-6 md:px-12 border-b border-slate-200 bg-white">
+        <div className="max-w-[1600px] mx-auto">
+          <div className="flex items-center gap-3 mb-4 font-tech text-xs font-bold text-[#D92B27] uppercase tracking-[0.25em]">
+            <span className="w-6 h-px bg-[#D92B27]" />
+            <span>OUR WORK & OUTREACH</span>
           </div>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-slate-500 text-base sm:text-lg md:text-xl font-medium max-w-xl mx-auto mt-6 leading-relaxed"
-          >
-            Discover the dynamic outreach programs, fellowship circles, and spiritual growth opportunities active within our church community.
-          </motion.p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+            <div className="lg:col-span-7">
+              <h1
+                className="font-khand font-bold text-[#222d61] leading-none uppercase"
+                style={{ fontSize: 'clamp(44px, 6.5vw, 96px)', letterSpacing: '0.01em' }}
+              >
+                ACTIVE <span className="font-serif-italic font-normal text-[#D92B27] lowercase">ministries</span>
+              </h1>
+            </div>
+            <div className="lg:col-span-5">
+              <p className="text-slate-500 text-base md:text-lg leading-relaxed font-normal">
+                Discover the dynamic outreach programmes and fellowship circles spanning worship, women, youth, children, media, and healthcare.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Grid List */}
-      <section className="py-20 px-4 md:px-10">
+      {/* ── Grid (Starts Immediately) ────────────────────────── */}
+      <section className="py-12 px-6 md:px-12 bg-[#F8F9FA]">
         <div className="max-w-[1600px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200 border border-slate-200">
             {ministriesData.map((item, idx) => (
-              <MinistryCard
-                key={idx}
-                index={idx}
-                imgSrc={item.imgSrc}
-                title={item.title}
-                description={item.description}
-                linkTo={item.linkTo}
-              />
+              <div key={idx} className="bg-[#F8F9FA]">
+                <MinistryCard
+                  index={idx}
+                  imgSrc={item.imgSrc}
+                  badge={item.badge}
+                  title={item.title}
+                  description={item.description}
+                  linkTo={item.linkTo}
+                />
+              </div>
             ))}
           </div>
         </div>
       </section>
-      
+
     </div>
   );
 }

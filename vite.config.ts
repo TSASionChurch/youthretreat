@@ -3,9 +3,15 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+const WP_THEME_DIST =
+  'C:/Users/HP/Local Sites/tsasion/app/public/wp-content/themes/tsa-sion/dist';
+
+export default defineConfig(({mode}) => {
+  const isWp = mode === 'wordpress';
+
   return {
     plugins: [react(), tailwindcss()],
+    base: isWp ? '/wp-content/themes/tsa-sion/dist/' : '/',
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
@@ -19,7 +25,9 @@ export default defineConfig(() => {
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },
     build: {
-      // Raise the warning threshold so large page chunks don't generate noise
+      outDir: isWp ? WP_THEME_DIST : 'dist',
+      emptyOutDir: true,
+      manifest: isWp,
       chunkSizeWarningLimit: 600,
       rollupOptions: {
         output: {

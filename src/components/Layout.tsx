@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Heart, Calendar, Facebook, Instagram, Youtube } from 'lucide-react';
-import StaircasePreloader from './StaircasePreloader';
+import { Menu, X, ArrowUpRight, Radio, Heart, Sparkles } from 'lucide-react';
 
 const NAV_LINKS = [
-  { label: 'Home',       href: '/'           },
-  { label: 'History',    href: '/history'     },
-  { label: 'Ministries', href: '/ministries'  },
-  { label: 'Contact',    href: '/contact'     },
+  { label: 'Home',       href: '/',          idx: '01' },
+  { label: 'History',    href: '/history',    idx: '02' },
+  { label: 'Ministries', href: '/ministries', idx: '03' },
+  { label: 'Retreat 26', href: '/retreat',    idx: '04' },
+  { label: 'Contact',    href: '/contact',    idx: '05' },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -20,197 +20,223 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative bg-white text-[#0A1128]">
-      <StaircasePreloader />
+    <div className="min-h-screen flex flex-col relative bg-white text-[#222d61]">
 
-      {/* ── Navbar ──────────────────────────────────────── */}
-      <nav className="fixed w-full z-50 top-0 left-0 px-4 md:px-8 py-4
-        bg-white/97 backdrop-blur-md
-        border-b border-slate-200 shadow-sm">
+      {/* Technical top utility bar */}
+      <div className="hidden md:flex justify-between items-center px-8 py-2 bg-[#222d61] text-white text-[10px] font-tech uppercase tracking-widest border-b border-white/10">
+        <div className="flex items-center gap-4 text-white/70">
+          <span className="flex items-center gap-1.5 text-[#FFE600] font-bold">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FFE600] animate-pulse" />
+            [LOC: SION, MUMBAI]
+          </span>
+          <span className="text-white/20">•</span>
+          <span>EST. 1940</span>
+          <span className="text-white/20">•</span>
+          <span className="text-[#FFE600] font-bold">SUNDAY WORSHIP @ 9:00 AM</span>
+        </div>
 
-        <div className="max-w-[1600px] mx-auto flex justify-between items-center">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group" onClick={() => setMobileOpen(false)}>
-            <img
-              src="/crest.png"
-              alt="Salvation Army Crest Logo"
-              width="40"
-              height="40"
-              className="w-10 h-10 object-contain group-hover:rotate-6 transition-transform duration-300"
-            />
+        <div className="flex items-center gap-5 text-white/70">
+          <span>TSA SION CORPS</span>
+
+          <a 
+            href="https://www.youtube.com/@SalvationArmyTamilCorpsSion" 
+            target="_blank" 
+            rel="noreferrer" 
+            className="hover:text-[#FFE600] transition-colors flex items-center gap-1.5 text-[#D92B27] font-bold"
+          >
+            <Radio size={12} className="animate-pulse" />
+            LIVE BROADCAST
+          </a>
+        </div>
+      </div>
+
+      {/* Unified Floating Pill Header — No Gap */}
+      <header className="sticky top-0 z-50 px-4 md:px-8 pt-2 pb-2 transition-all duration-300 pointer-events-none">
+        <div className="max-w-[1500px] mx-auto glass-pill px-4 py-2 rounded-full shadow-2xl border border-white/20 flex items-center justify-between pointer-events-auto">
+          
+          {/* Logo container — Direct SVG without red circle */}
+          <Link 
+            to="/" 
+            className="flex items-center gap-3 text-white pl-1 group"
+            onClick={() => setMobileOpen(false)}
+          >
+            <img src="/logo.svg" alt="The Salvation Army" className="h-8 sm:h-9 object-contain group-hover:scale-105 transition-transform duration-300" />
             <div className="flex flex-col">
-              <span className="font-black text-sm sm:text-base leading-none tracking-tight uppercase text-[#0A1128]">
-                The Salvation Army
+              <span className="font-syne font-extrabold text-sm tracking-tight leading-none text-white group-hover:text-[#FFE600] transition-colors">
+                TSA SION
               </span>
-              <span className="font-extrabold text-[9px] tracking-wider uppercase text-[#D92B27]">
-                Tamil Church Sion
+              <span className="text-[9px] font-tech text-slate-300 uppercase tracking-widest mt-0.5">
+                EST. 1940
               </span>
             </div>
           </Link>
 
-          {/* Desktop links */}
-          <div className="hidden lg:flex items-center gap-1">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                to={link.href}
-                className={`px-4 py-2 text-xs font-black uppercase tracking-widest transition-all duration-300 rounded-full ${
-                  isLinkActive(link.href)
-                    ? 'text-[#D92B27] bg-[#D92B27]/10'
-                    : 'text-[#0A1128]/60 hover:text-[#D92B27] hover:bg-[#D92B27]/5'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+          {/* Unified Center Navigation Bar */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {NAV_LINKS.map((link) => {
+              const active = isLinkActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className={`relative px-4 py-2 text-xs font-tech font-bold uppercase tracking-wider rounded-full transition-all duration-300 flex items-center gap-1.5 ${
+                    active
+                      ? 'bg-[#D92B27] text-white shadow-md'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  {active && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#FFE600] inline-block shadow-[0_0_8px_#FFE600]" />
+                  )}
+                  <span>{link.label}</span>
+                  <span className={`text-[9px] font-mono ${active ? 'text-white/70' : 'text-slate-400'}`}>
+                    {link.idx}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
 
-            {/* Retreat pill */}
-            <Link
-              to="/retreat"
-              className={`px-4 py-2 text-xs font-black uppercase tracking-widest transition-colors rounded-full flex items-center gap-1.5 ${
-                isLinkActive('/retreat')
-                  ? 'text-[#D92B27] bg-[#D92B27]/10'
-                  : 'text-[#D92B27] hover:bg-[#D92B27]/5'
-              }`}
-            >
-              <span className="w-2 h-2 rounded-full bg-[#D92B27]" />
-              <span>Retreat 2026</span>
-            </Link>
-          </div>
-
-          {/* Right actions */}
-          <div className="flex items-center gap-2">
+          {/* Unified Right Action CTAs */}
+          <div className="hidden sm:flex items-center gap-2">
             <Link
               to="/donate"
-              className="px-5 md:px-6 py-2.5 rounded-full bg-[#D92B27] hover:bg-[#0A1128] text-white font-black uppercase text-xs tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-md hover:shadow-lg"
+              className="px-4 py-2 rounded-full bg-white text-[#222d61] hover:bg-[#FFE600] text-xs font-tech font-extrabold uppercase tracking-widest shadow-md transition-all duration-300 flex items-center gap-1.5 group hover:scale-105"
             >
-              <Heart size={13} className="stroke-[2.5]" />
-              <span className="hidden sm:inline">Donate Us</span>
-              <span className="sm:hidden">Donate</span>
+              <span>Give / Support</span>
+              <Heart size={13} className="text-[#D92B27] fill-[#D92B27]" />
             </Link>
-
-            {/* Mobile hamburger */}
-            <button
-              className="lg:hidden w-12 h-12 flex items-center justify-center rounded-full text-[#0A1128] hover:bg-slate-100 transition-colors"
-              onClick={() => setMobileOpen((v) => !v)}
-              aria-label="Toggle menu"
+            
+            <Link
+              to="/register"
+              className="px-4 py-2 rounded-full bg-[#D92B27] text-white hover:bg-[#FFE600] hover:text-[#222d61] text-xs font-tech font-extrabold uppercase tracking-widest shadow-lg transition-all duration-300 flex items-center gap-1.5 group hover:scale-105"
             >
-              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
+              <span>Register Now</span>
+              <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </Link>
           </div>
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="lg:hidden w-10 h-10 rounded-full bg-[#222d61] border border-white/10 text-white flex items-center justify-center shadow-lg hover:bg-[#D92B27] transition-colors"
+            aria-label="Toggle Navigation Menu"
+          >
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
         </div>
 
-        {/* Mobile dropdown */}
+        {/* Mobile Navigation Drawer */}
         {mobileOpen && (
-          <div className="lg:hidden mt-2 mx-0 pb-4 border-t border-slate-100 pt-3 flex flex-col gap-1">
+          <div className="lg:hidden mt-3 mx-auto max-w-[1400px] glass-pill rounded-2xl p-6 shadow-2xl border border-white/15 pointer-events-auto flex flex-col gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10 text-xs font-tech text-[#FFE600] font-bold tracking-widest">
+              <span>// MENU NAVIGATION</span>
+              <span>[N.01/05]</span>
+            </div>
+            
             {NAV_LINKS.map((link) => (
               <Link
-                key={link.label}
+                key={link.href}
                 to={link.href}
                 onClick={() => setMobileOpen(false)}
-                className={`px-4 py-3 text-sm font-black uppercase tracking-widest rounded-xl transition-colors ${
+                className={`px-4 py-3 text-xs font-tech font-bold uppercase tracking-widest rounded-xl transition-all flex justify-between items-center ${
                   isLinkActive(link.href)
-                    ? 'text-[#D92B27] bg-[#D92B27]/5'
-                    : 'text-[#0A1128]/70 hover:text-[#D92B27] hover:bg-[#D92B27]/5'
+                    ? 'text-white bg-[#D92B27] shadow-md'
+                    : 'text-white/80 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                {link.label}
+                <div className="flex items-center gap-2">
+                  {isLinkActive(link.href) && <span className="w-2 h-2 rounded-full bg-[#FFE600]" />}
+                  <span>{link.label}</span>
+                </div>
+                <span className="text-[10px] font-mono text-white/50">// {link.idx}</span>
               </Link>
             ))}
-            <Link
-              to="/retreat"
-              onClick={() => setMobileOpen(false)}
-              className={`px-4 py-3 text-sm font-black uppercase tracking-widest rounded-xl transition-colors flex items-center gap-2 ${
-                isLinkActive('/retreat')
-                  ? 'text-[#D92B27] bg-[#D92B27]/5'
-                  : 'text-[#D92B27] hover:bg-[#D92B27]/5'
-              }`}
-            >
-              <span className="w-2 h-2 rounded-full bg-[#D92B27]" />
-              <span>Retreat 2026</span>
-            </Link>
+
+            <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
+              <Link
+                to="/retreat"
+                onClick={() => setMobileOpen(false)}
+                className="w-full py-3 bg-[#FFE600] text-[#222d61] text-xs font-tech font-extrabold uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 shadow-md"
+              >
+                <Sparkles size={14} className="text-[#D92B27]" />
+                <span>Youth Retreat 2026</span>
+              </Link>
+              <Link
+                to="/donate"
+                onClick={() => setMobileOpen(false)}
+                className="w-full py-3 bg-white/10 text-white text-xs font-tech font-bold uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 hover:bg-white/20"
+              >
+                <Heart size={14} className="text-[#D92B27]" />
+                <span>Support &amp; Giving</span>
+              </Link>
+            </div>
           </div>
         )}
-      </nav>
+      </header>
 
-      {/* ── Main content ─────────────────────────────────── */}
-      <main className="flex-grow pt-16">
+      {/* Main Content Area */}
+      <main className="flex-grow">
         {children}
       </main>
 
-      {/* ── Footer ──────────────────────────────────────── */}
-      <footer className="bg-[#F8FAFC] py-16 md:py-24 px-4 md:px-8 border-t border-slate-200 text-[#0A1128]">
-        <div className="max-w-[1400px] mx-auto">
+      {/* Compact Footer */}
+      <footer className="bg-[#222d61] text-white pt-10 pb-8 px-6 md:px-12 border-t border-white/10">
+        <div className="max-w-[1600px] mx-auto">
 
-          {/* Top badges */}
-          <div className="flex flex-wrap items-center gap-3 mb-12">
-            <span className="px-5 py-2.5 rounded-full bg-white border border-slate-200 text-[#0A1128] font-black text-xs uppercase tracking-wider">
-              TSA Sion Church
-            </span>
-            <Link
-              to="/retreat"
-              className="px-5 py-2.5 rounded-full bg-[#D92B27] text-white font-black text-xs uppercase tracking-wider hover:bg-[#0A1128] transition-colors flex items-center gap-1.5"
-            >
-              <Calendar size={12} />
-              <span>Youth Retreat 2026 Event</span>
-            </Link>
-            <Link
-              to="/donate"
-              className="px-5 py-2.5 rounded-full bg-[#FFE600] text-[#0A1128] font-black text-xs uppercase tracking-wider hover:scale-105 transition-all"
-            >
-              Support Our Mission
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end mb-16">
-            <div className="lg:col-span-8">
-              <h2
-                className="font-bold uppercase tracking-tighter leading-[0.9] text-[#0A1128]"
-                style={{ fontSize: 'clamp(30px, 5vw, 72px)', fontFamily: 'Unbounded' }}
-              >
-                TSA<br />
-                <span className="text-[#D92B27]">Sion Tamil Corps</span>
-              </h2>
-            </div>
-
-            <div className="lg:col-span-4">
-              <p className="text-base font-normal text-slate-600 leading-relaxed mb-6">
-                Our church has been serving the Sion and Dharavi community in Mumbai since 1940. We believe in sharing the love of God through spiritual leadership and practical community actions.
-              </p>
-              <div className="flex items-center gap-3">
-                {[
-                  { href: 'https://www.facebook.com/groups/say.youth/', label: 'Facebook Page', Icon: Facebook },
-                  { href: 'https://www.instagram.com/salvationarmysion/', label: 'Instagram Profile', Icon: Instagram },
-                  { href: 'https://www.youtube.com/@SalvationArmyTamilCorpsSion', label: 'YouTube Channel', Icon: Youtube },
-                ].map(({ href, label, Icon }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={label}
-                    className="w-12 h-12 rounded-full border border-slate-200 hover:border-[#D92B27] hover:text-[#D92B27] flex items-center justify-center transition-colors bg-white text-slate-500 shadow-sm"
-                  >
-                    <Icon size={16} />
-                  </a>
-                ))}
+          {/* Top row: Logo + Nav + Socials */}
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-white/10">
+            
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3 group">
+              <img src="/logo.svg" alt="The Salvation Army" className="h-8 object-contain" />
+              <div className="flex flex-col">
+                <span className="font-tech font-extrabold text-sm tracking-tight leading-none text-white">TSA SION</span>
+                <span className="text-[9px] font-tech text-white/50 uppercase tracking-widest mt-0.5">EST. 1940 · SION, MUMBAI</span>
               </div>
-            </div>
-          </div>
+            </Link>
 
-          <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs font-semibold text-slate-500 gap-4">
-            <p>© 2026 TSA Sion Media Team. All rights reserved.</p>
-            <div className="flex flex-wrap gap-4 sm:gap-6 uppercase tracking-wider font-extrabold text-[#0A1128] justify-center">
+            {/* Nav links */}
+            <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-tech text-white/60">
               {[
-                { to: '/history',    label: 'About Us'     },
-                { to: '/ministries', label: 'Ministries'   },
-                { to: '/retreat',    label: 'Retreat 2026' },
-                { to: '/contact',    label: 'Contact'      },
-              ].map(({ to, label }) => (
-                <Link key={to} to={to} className="hover:text-[#D92B27] transition-colors">
-                  {label}
+                { label: 'Home', href: '/' },
+                { label: 'History', href: '/history' },
+                { label: 'Ministries', href: '/ministries' },
+                { label: 'Retreat 26', href: '/retreat' },
+                { label: 'Contact', href: '/contact' },
+                { label: 'Support', href: '/donate' },
+              ].map(l => (
+                <Link key={l.href} to={l.href} className="hover:text-[#FFE600] transition-colors uppercase tracking-wider">
+                  {l.label}
                 </Link>
               ))}
+            </nav>
+
+            {/* Socials */}
+            <div className="flex items-center gap-3">
+              {[
+                { label: 'Facebook', href: 'https://www.facebook.com/groups/say.youth/' },
+                { label: 'Instagram', href: 'https://www.instagram.com/salvationarmysion/' },
+                { label: 'YouTube', href: 'https://www.youtube.com/@SalvationArmyTamilCorpsSion' },
+              ].map(s => (
+                <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-full border border-white/20 text-[10px] font-tech font-bold uppercase tracking-wider text-white/70 hover:text-[#FFE600] hover:border-[#FFE600] transition-all duration-200">
+                  {s.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom row: Copyright */}
+          <div className="pt-5 flex flex-col sm:flex-row items-center justify-between text-[10px] font-tech text-white/40 gap-2">
+            <p>© 2026 TSA Sion Media Team. All rights reserved.</p>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1.5">
+                <Radio size={9} className="text-[#D92B27] animate-pulse" />
+                <span className="text-white/60 uppercase tracking-widest">Broadcast Ready</span>
+              </span>
+              <span>·</span>
+              <span className="uppercase tracking-widest">Tamil Church Sion</span>
             </div>
           </div>
 

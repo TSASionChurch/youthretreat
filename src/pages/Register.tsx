@@ -84,211 +84,211 @@ export default function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (isSubmitting) return;
+    if (isSubmitting) return;
 
-  setIsSubmitting(true);
-  setSubmitError(null);
-  setIsDuplicate(false);
+    setIsSubmitting(true);
+    setSubmitError(null);
+    setIsDuplicate(false);
 
-  const formattedDob = formatDateToMMDDYYYY(formData.dob);
+    const formattedDob = formatDateToMMDDYYYY(formData.dob);
 
-  const finalPayload = {
-    name: formData.name.trim(),
-    gender: formData.gender === "Other" ? formData.otherGender.trim() || "Other" : formData.gender,
-    dob: formattedDob,
-    phone: formData.phone.trim(),
-    email: formData.email.trim(),
-    church: formData.church === "Other" ? formData.otherChurch.trim() || "Other" : formData.church,
-    isOfficer: formData.isOfficer,
-    tshirtSize: formData.tshirtSize === "Other" ? formData.otherTshirtSize.trim() || "Other" : formData.tshirtSize,
-  };
-
-  try {
-    // -------------------------------------------------------
-    // STEP 1: Get server-generated UID (no sheet write yet)
-    // -------------------------------------------------------
-    const generateParams = new URLSearchParams();
-    generateParams.append("name", finalPayload.name);
-    generateParams.append("dob", finalPayload.dob);
-    generateParams.append("gender", finalPayload.gender);
-    generateParams.append("whatsapp", finalPayload.phone);
-    generateParams.append("email", finalPayload.email);
-    generateParams.append("church", finalPayload.church);
-    generateParams.append("officers", finalPayload.isOfficer);
-    generateParams.append("size", finalPayload.tshirtSize);
-    generateParams.append("step", "generate");
-
-    const generateResponse = await fetch(GOOGLE_APP_SCRIPT_URL, {
-      method: "POST",
-      body: generateParams,
-    });
-
-    const generateText = await generateResponse.text();
-    console.log("Generate response:", generateText);
-
-    let generateResult: {
-      success: boolean;
-      step?: string;
-      uid?: string;
-      name?: string;
-      dob?: string;
-      age?: number;
-      ageGroup?: string;
-      duplicate?: boolean;
-      message?: string;
-      error?: string;
+    const finalPayload = {
+      name: formData.name.trim(),
+      gender: formData.gender === "Other" ? formData.otherGender.trim() || "Other" : formData.gender,
+      dob: formattedDob,
+      phone: formData.phone.trim(),
+      email: formData.email.trim(),
+      church: formData.church === "Other" ? formData.otherChurch.trim() || "Other" : formData.church,
+      isOfficer: formData.isOfficer,
+      tshirtSize: formData.tshirtSize === "Other" ? formData.otherTshirtSize.trim() || "Other" : formData.tshirtSize,
     };
 
     try {
-      generateResult = JSON.parse(generateText);
-    } catch {
-      generateResult = { success: generateResponse.ok };
-    }
+      // -------------------------------------------------------
+      // STEP 1: Get server-generated UID (no sheet write yet)
+      // -------------------------------------------------------
+      const generateParams = new URLSearchParams();
+      generateParams.append("name", finalPayload.name);
+      generateParams.append("dob", finalPayload.dob);
+      generateParams.append("gender", finalPayload.gender);
+      generateParams.append("whatsapp", finalPayload.phone);
+      generateParams.append("email", finalPayload.email);
+      generateParams.append("church", finalPayload.church);
+      generateParams.append("officers", finalPayload.isOfficer);
+      generateParams.append("size", finalPayload.tshirtSize);
+      generateParams.append("step", "generate");
 
-    if (!generateResult.success) {
-      if (generateResult.duplicate) {
-        setIsDuplicate(true);
-        setSubmitError(
-          generateResult.message ||
-          "A registration already exists for this name and date of birth."
-        );
-      } else {
-        setSubmitError(
-          generateResult.error ||
-          generateResult.message ||
-          "Registration failed. Please try again."
-        );
-      }
-      return;
-    }
-
-    const serverUid = generateResult.uid;
-    if (!serverUid) {
-      throw new Error("Server did not return a UID");
-    }
-
-    console.log("Server-generated UID:", serverUid);
-
-    // -------------------------------------------------------
-    // STEP 2: Generate QR code with the SERVER UID
-    // -------------------------------------------------------
-    const qrPayload = `${serverUid}|${finalPayload.name}|${finalPayload.dob}`;
-    console.log("QR Payload with server UID:", qrPayload);
-
-    let qrBase64 = "";
-    try {
-      const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.left = '-9999px';
-      document.body.appendChild(container);
-
-      const { createRoot } = await import('react-dom/client');
-      const root = createRoot(container);
-      await new Promise<void>((resolve) => {
-        root.render(
-          React.createElement(QRCode, {
-            value: qrPayload,
-            size: 300,
-            level: 'H',
-            bgColor: '#ffffff',
-            fgColor: '#0A1128',
-          })
-        );
-        setTimeout(resolve, 100);
+      const generateResponse = await fetch(GOOGLE_APP_SCRIPT_URL, {
+        method: "POST",
+        body: generateParams,
       });
 
-      const svgEl = container.querySelector('svg') as SVGSVGElement | null;
-      if (svgEl) {
-        qrBase64 = await svgElementToBase64Png(svgEl, 300);
+      const generateText = await generateResponse.text();
+      console.log("Generate response:", generateText);
+
+      let generateResult: {
+        success: boolean;
+        step?: string;
+        uid?: string;
+        name?: string;
+        dob?: string;
+        age?: number;
+        ageGroup?: string;
+        duplicate?: boolean;
+        message?: string;
+        error?: string;
+      };
+
+      try {
+        generateResult = JSON.parse(generateText);
+      } catch {
+        generateResult = { success: generateResponse.ok };
       }
 
-      root.unmount();
-      document.body.removeChild(container);
-    } catch (qrErr) {
-      console.warn('QR generation failed:', qrErr);
-    }
+      if (!generateResult.success) {
+        if (generateResult.duplicate) {
+          setIsDuplicate(true);
+          setSubmitError(
+            generateResult.message ||
+            "A registration already exists for this name and date of birth."
+          );
+        } else {
+          setSubmitError(
+            generateResult.error ||
+            generateResult.message ||
+            "Registration failed. Please try again."
+          );
+        }
+        return;
+      }
 
-    // -------------------------------------------------------
-    // STEP 3: Finalize registration with QR code
-    // -------------------------------------------------------
-    const finalizeParams = new URLSearchParams();
-    finalizeParams.append("name", finalPayload.name);
-    finalizeParams.append("dob", finalPayload.dob);
-    finalizeParams.append("gender", finalPayload.gender);
-    finalizeParams.append("whatsapp", finalPayload.phone);
-    finalizeParams.append("email", finalPayload.email);
-    finalizeParams.append("church", finalPayload.church);
-    finalizeParams.append("officers", finalPayload.isOfficer);
-    finalizeParams.append("size", finalPayload.tshirtSize);
-    finalizeParams.append("qrBase64", qrBase64 || "");
-    finalizeParams.append("step", "finalize");
-    finalizeParams.append("tempUid", serverUid);
+      const serverUid = generateResult.uid;
+      if (!serverUid) {
+        throw new Error("Server did not return a UID");
+      }
 
-    const finalizeResponse = await fetch(GOOGLE_APP_SCRIPT_URL, {
-      method: "POST",
-      body: finalizeParams,
-    });
+      console.log("Server-generated UID:", serverUid);
 
-    const finalizeText = await finalizeResponse.text();
-    console.log("Finalize response:", finalizeText);
+      // -------------------------------------------------------
+      // STEP 2: Generate QR code with the SERVER UID
+      // -------------------------------------------------------
+      const qrPayload = `${serverUid}|${finalPayload.name}|${finalPayload.dob}`;
+      console.log("QR Payload with server UID:", qrPayload);
 
-    let finalizeResult: {
-      success: boolean;
-      step?: string;
-      message?: string;
-      error?: string;
-      uid?: string;
-      age?: number;
-      ageGroup?: string;
-      emailSent?: boolean;
-    };
+      let qrBase64 = "";
+      try {
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        document.body.appendChild(container);
 
-    try {
-      finalizeResult = JSON.parse(finalizeText);
-    } catch {
-      finalizeResult = { success: finalizeResponse.ok };
-    }
+        const { createRoot } = await import('react-dom/client');
+        const root = createRoot(container);
+        await new Promise<void>((resolve) => {
+          root.render(
+            React.createElement(QRCode, {
+              value: qrPayload,
+              size: 300,
+              level: 'H',
+              bgColor: '#ffffff',
+              fgColor: '#222d61',
+            })
+          );
+          setTimeout(resolve, 100);
+        });
 
-    if (!finalizeResult.success) {
-      setSubmitError(
-        finalizeResult.error ||
-        finalizeResult.message ||
-        "Failed to save registration. Please try again."
-      );
-      return;
-    }
+        const svgEl = container.querySelector('svg') as SVGSVGElement | null;
+        if (svgEl) {
+          qrBase64 = await svgElementToBase64Png(svgEl, 300);
+        }
 
-    // -------------------------------------------------------
-    // STEP 4: Navigate to confirmation
-    // -------------------------------------------------------
-    navigate("/confirmation", {
-      state: {
-        user: {
-          ...finalPayload,
-          uid: serverUid,
-          age: finalizeResult.age ?? generateResult.age ?? null,
-          ageGroup: finalizeResult.ageGroup ?? generateResult.ageGroup ?? "",
-          emailSent: finalizeResult.emailSent ?? false,
-          qrData: qrPayload,
+        root.unmount();
+        document.body.removeChild(container);
+      } catch (qrErr) {
+        console.warn('QR generation failed:', qrErr);
+      }
+
+      // -------------------------------------------------------
+      // STEP 3: Finalize registration with QR code
+      // -------------------------------------------------------
+      const finalizeParams = new URLSearchParams();
+      finalizeParams.append("name", finalPayload.name);
+      finalizeParams.append("dob", finalPayload.dob);
+      finalizeParams.append("gender", finalPayload.gender);
+      finalizeParams.append("whatsapp", finalPayload.phone);
+      finalizeParams.append("email", finalPayload.email);
+      finalizeParams.append("church", finalPayload.church);
+      finalizeParams.append("officers", finalPayload.isOfficer);
+      finalizeParams.append("size", finalPayload.tshirtSize);
+      finalizeParams.append("qrBase64", qrBase64 || "");
+      finalizeParams.append("step", "finalize");
+      finalizeParams.append("tempUid", serverUid);
+
+      const finalizeResponse = await fetch(GOOGLE_APP_SCRIPT_URL, {
+        method: "POST",
+        body: finalizeParams,
+      });
+
+      const finalizeText = await finalizeResponse.text();
+      console.log("Finalize response:", finalizeText);
+
+      let finalizeResult: {
+        success: boolean;
+        step?: string;
+        message?: string;
+        error?: string;
+        uid?: string;
+        age?: number;
+        ageGroup?: string;
+        emailSent?: boolean;
+      };
+
+      try {
+        finalizeResult = JSON.parse(finalizeText);
+      } catch {
+        finalizeResult = { success: finalizeResponse.ok };
+      }
+
+      if (!finalizeResult.success) {
+        setSubmitError(
+          finalizeResult.error ||
+          finalizeResult.message ||
+          "Failed to save registration. Please try again."
+        );
+        return;
+      }
+
+      // -------------------------------------------------------
+      // STEP 4: Navigate to confirmation
+      // -------------------------------------------------------
+      navigate("/confirmation", {
+        state: {
+          user: {
+            ...finalPayload,
+            uid: serverUid,
+            age: finalizeResult.age ?? generateResult.age ?? null,
+            ageGroup: finalizeResult.ageGroup ?? generateResult.ageGroup ?? "",
+            emailSent: finalizeResult.emailSent ?? false,
+            qrData: qrPayload,
+          },
         },
-      },
-    });
+      });
 
-  } catch (error) {
-    console.error("Registration submission failed:", error);
-    setSubmitError(
-      "There was a problem submitting your registration. Please check your connection and try again."
-    );
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    } catch (error) {
+      console.error("Registration submission failed:", error);
+      setSubmitError(
+        "There was a problem submitting your registration. Please check your connection and try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div className="retreat-site min-h-screen pt-24 sm:pt-32 pb-24 bg-[#F8FAFC] text-[#0A1128]">
+    <div className="retreat-site min-h-screen pt-24 sm:pt-32 pb-24 bg-[#F8FAFC] text-[#222d61]">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 relative z-10">
 
         {/* TOP HEADER CARD */}
@@ -306,7 +306,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               <span>Youth Retreat 2026 Official Registration</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-tight text-[#0A1128] mb-4">
+            <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-tight text-[#222d61] mb-4">
               Registration <span className="text-[#D92B27]">Form</span>
             </h1>
 
@@ -334,7 +334,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               : 'border-slate-200'
               }`}
           >
-            <label htmlFor="name" className="block text-base sm:text-lg font-black text-[#0A1128] mb-2">
+            <label htmlFor="name" className="block text-base sm:text-lg font-black text-[#222d61] mb-2">
               Full Name <span className="text-[#D92B27] font-bold">*</span>
             </label>
             <p className="text-xs sm:text-sm text-slate-500 mb-4">Enter your full legal name as it should appear on your pass.</p>
@@ -347,7 +347,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               onFocus={() => setFocusedField('name')}
               onChange={handleChange}
               placeholder="Your answer"
-              className="w-full sm:w-3/4 bg-transparent border-b-2 border-slate-300 py-2 sm:py-3 text-lg sm:text-xl font-medium text-[#0A1128] focus:outline-none focus:border-[#D92B27] transition-colors placeholder:text-slate-400"
+              className="w-full sm:w-3/4 bg-transparent border-b-2 border-slate-300 py-2 sm:py-3 text-lg sm:text-xl font-medium text-[#222d61] focus:outline-none focus:border-[#D92B27] transition-colors placeholder:text-slate-400"
             />
           </motion.div>
 
@@ -362,7 +362,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               : 'border-slate-200'
               }`}
           >
-            <label htmlFor="dob" className="block text-base sm:text-lg font-black text-[#0A1128] mb-2">
+            <label htmlFor="dob" className="block text-base sm:text-lg font-black text-[#222d61] mb-2">
               Date of Birth <span className="text-[#D92B27] font-bold">*</span>
             </label>
             <p className="text-xs sm:text-sm text-slate-500 mb-4">Select your date of birth.</p>
@@ -374,7 +374,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               value={formData.dob}
               onFocus={() => setFocusedField('dob')}
               onChange={handleChange}
-              className="w-full sm:w-1/2 bg-transparent border-b-2 border-slate-300 py-2 sm:py-3 text-base sm:text-lg font-medium text-[#0A1128] focus:outline-none focus:border-[#D92B27] transition-colors"
+              className="w-full sm:w-1/2 bg-transparent border-b-2 border-slate-300 py-2 sm:py-3 text-base sm:text-lg font-medium text-[#222d61] focus:outline-none focus:border-[#D92B27] transition-colors"
             />
           </motion.div>
 
@@ -389,7 +389,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               : 'border-slate-200'
               }`}
           >
-            <label className="block text-base sm:text-lg font-black text-[#0A1128] mb-4">
+            <label className="block text-base sm:text-lg font-black text-[#222d61] mb-4">
               Gender <span className="text-[#D92B27] font-bold">*</span>
             </label>
 
@@ -409,7 +409,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     onFocus={() => setFocusedField('gender')}
                     className="w-5 h-5 accent-[#D92B27] cursor-pointer"
                   />
-                  <span className="text-base sm:text-lg font-semibold text-[#0A1128]">
+                  <span className="text-base sm:text-lg font-bold text-[#222d61]">
                     {option}
                   </span>
                 </label>
@@ -432,7 +432,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     value={formData.otherGender}
                     onChange={handleChange}
                     placeholder="Please specify your gender..."
-                    className="w-full sm:w-3/4 bg-transparent border-b-2 border-[#D92B27] py-2 text-base sm:text-lg font-medium text-[#0A1128] focus:outline-none placeholder:text-slate-400"
+                    className="w-full sm:w-3/4 bg-transparent border-b-2 border-[#D92B27] py-2 text-base sm:text-lg font-medium text-[#222d61] focus:outline-none placeholder:text-slate-400"
                   />
                 </motion.div>
               )}
@@ -586,7 +586,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     onFocus={() => setFocusedField('isOfficer')}
                     className="w-5 h-5 accent-[#D92B27] cursor-pointer"
                   />
-                  <span className="text-base sm:text-lg font-semibold text-[#0A1128]">
+                  <span className="text-base sm:text-lg font-bold text-[#0A1128]">
                     {item.label}
                   </span>
                 </label>
@@ -626,7 +626,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     onFocus={() => setFocusedField('tshirtSize')}
                     className="w-5 h-5 accent-[#D92B27] cursor-pointer"
                   />
-                  <span className="text-base sm:text-lg font-semibold text-[#0A1128]">
+                  <span className="text-base sm:text-lg font-bold text-[#0A1128]">
                     {size}
                   </span>
                 </label>

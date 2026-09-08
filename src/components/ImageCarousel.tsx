@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { media } from '../lib/assets';
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 
 interface Slide {
   imgSrc: string;
-  bgClass: string; // Tailwind bg color class
-  titleColor: string; // Tailwind text color class for title
-  btnClass: string; // Tailwind bg/hover class for button
   eyebrow: string;
   title: string;
+  subtitle: string;
+  yearTag: string;
   description: string;
   ctaText: string;
   ctaLink: string;
@@ -17,26 +17,23 @@ interface Slide {
 
 const SLIDES: Slide[] = [
   {
-    imgSrc: '/DSC_0001.webp',
-    bgClass: 'bg-[#FCEAE8]', // Soft Rose
-    titleColor: 'text-[#3b1715]',
-    btnClass: 'bg-[#D92B27] hover:bg-[#0A1128] text-white',
-    eyebrow: 'Sion Tamil Church',
-    title: 'Welcome to\nour church',
-    description: 'A community focused on spiritual growth, dedicated to loving God and serving Sion & Dharavi since 1940.',
-    ctaText: 'Learn More',
+    imgSrc: media('/DSC_0001.webp'),
+    eyebrow: 'SION TAMIL CHURCH',
+    title: 'Welcome to our church',
+    subtitle: 'A community focused on spiritual growth & dedicated service',
+    yearTag: '1940 – 2026',
+    description: 'Serving Sion & Dharavi with faith, fellowship, and love for over 86 years.',
+    ctaText: 'Learn Our History',
     ctaLink: '/history'
   },
-
   {
-    imgSrc: '/yr.jpg',
-    bgClass: 'bg-[#FFFDE7]', // Soft Yellow/Gold
-    titleColor: 'text-[#5D4037]',
-    btnClass: 'bg-[#D92B27] hover:bg-[#0A1128] text-white',
-    eyebrow: 'SAY Youth Group',
-    title: 'Youth Retreat\n2026',
-    description: 'Empowering the next generation of Christian leaders. Register now for our annual youth retreat!',
-    ctaText: 'View Retreat',
+    imgSrc: media('/yr.jpg'),
+    eyebrow: 'SAY YOUTH GROUP',
+    title: 'Youth Retreat 2026',
+    subtitle: 'Empowering the next generation of Christian leaders',
+    yearTag: 'ANNUAL EVENT',
+    description: 'Join us for three transformative days of prayer, outdoor workshops, and spiritual growth.',
+    ctaText: 'View Retreat Details',
     ctaLink: '/retreat'
   }
 ];
@@ -64,130 +61,125 @@ export default function ImageCarousel() {
   const slide = SLIDES[active];
 
   return (
-    <div className={`w-full py-16 md:py-24 px-6 sm:px-10 md:px-16 border-b border-slate-200 transition-colors duration-1000 ${slide.bgClass}`}>
+    <div className="relative w-full h-[82vh] min-h-[580px] max-h-[850px] overflow-hidden bg-[#182046] text-white">
       
-      {/* Centered Cursive Scriptural Quote at the Top */}
-      <div className="w-full text-center mb-10 md:mb-14">
-        <p className="text-slate-600 italic font-medium text-xs sm:text-sm tracking-wide">
-          I was glad when they said to me, “Let us go into the house of the Lord.” Psalm 122:1
-        </p>
-      </div>
+      {/* Background image carousel with cinematic fades */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={active}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute inset-0 w-full h-full"
+        >
+          <img
+            src={slide.imgSrc}
+            alt={slide.title}
+            className="w-full h-full object-cover object-center"
+          />
+          {/* Subtle vignette & gradient overlays */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/25" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
+        </motion.div>
+      </AnimatePresence>
 
-      <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16 items-center">
-        
-        {/* Left Column - Dynamic Text Block */}
-        <div className="lg:col-span-5 flex flex-col justify-center min-h-[300px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.4 }}
-            >
-              <div className="flex items-center gap-2.5 mb-5">
-                <span className="w-6 h-[1.5px] bg-[#D92B27]" />
-                <span className="text-[#D92B27] font-black uppercase text-[10px] sm:text-xs tracking-[0.25em]">
-                  {slide.eyebrow}
-                </span>
-              </div>
-
-              <h1 
-                className={`font-bold  uppercase leading-[0.9] tracking-tighter mb-6 ${slide.titleColor}`}
-                style={{ fontSize: 'clamp(38px, 6vw, 72px)' ,fontFamily:"Unbounded"}}
-              >
-                {slide.title.split('\n').map((line, idx) => (
-                  <React.Fragment key={idx}>
-                    {line}
-                    {idx < slide.title.split('\n').length - 1 && <br />}
-                  </React.Fragment>
-                ))}
-              </h1>
-
-              <p className="text-slate-600 text-sm sm:text-base font-semibold max-w-md leading-relaxed mb-8">
-                {slide.description}
-              </p>
-
-              <div className="flex items-center gap-4 flex-wrap">
-                <Link
-                  to={slide.ctaLink}
-                  className={`inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-xs font-black uppercase tracking-widest transition-colors duration-300 shadow-md hover:shadow-lg ${slide.btnClass}`}
-                >
-                  <span>{slide.ctaText}</span>
-                  <ArrowRight size={13} className="stroke-[2.5]" />
-                </Link>
-
-                {/* Manual slide controllers */}
-                <div className="flex items-center gap-2 ml-2">
-                  <button
-                    onClick={prevSlide}
-                    aria-label="Previous slide"
-                    className="w-12 h-12 rounded-full border border-slate-300 hover:border-slate-400 bg-white/70 hover:bg-white text-slate-600 flex items-center justify-center transition-colors"
-                  >
-                    <ArrowLeft size={16} className="stroke-[2.5]" />
-                  </button>
-                  <button
-                    onClick={nextSlide}
-                    aria-label="Next slide"
-                    className="w-12 h-12 rounded-full border border-slate-300 hover:border-slate-400 bg-white/70 hover:bg-white text-slate-600 flex items-center justify-center transition-colors"
-                  >
-                    <ArrowRight size={16} className="stroke-[2.5]" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* Right Column - Slanted Image Frame */}
-        <div className="lg:col-span-7 w-full flex items-center justify-center">
-          <div className="w-full h-[240px] sm:h-[320px] md:h-[440px] bg-[#D92B27] transform -skew-x-12 overflow-hidden rounded-none border-4 border-white shadow-xl relative">
-            {/* Persistent dark fill — prevents white flash between crossfades */}
-            <div className="w-full h-full transform skew-x-12 relative flex items-center justify-center bg-[#111]">
-
-              <AnimatePresence mode="sync">
-                <motion.div
-                  key={active}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.7, ease: 'easeInOut' }}
-                  className="absolute inset-0 flex items-center justify-center p-4"
-                >
-                  {/* Uncropped image element */}
-                  <img
-                    src={slide.imgSrc}
-                    alt={slide.title}
-                    draggable={false}
-                    width="1920"
-                    height="1271"
-                    className="max-w-full max-h-full object-contain relative z-10 rounded-none"
-                  />
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Yellow highlight edge decoration */}
-              <div className="absolute right-0 top-0 bottom-0 w-2.5 bg-[#FFE600] z-20" />
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Pagination indicators at the bottom */}
-      <div className="max-w-[1600px] mx-auto mt-8 flex justify-center gap-2">
+      {/* Far left edge vertical progress bar indicators (reference image matching) */}
+      <div className="absolute left-6 sm:left-12 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-3">
         {SLIDES.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setActive(idx)}
             aria-label={`Go to slide ${idx + 1}`}
-            className="py-5 px-1.5 group cursor-pointer"
+            className="group py-1 cursor-pointer"
           >
-            <div className={`h-2 rounded-full transition-all duration-300 ${
-              idx === active ? 'w-8 bg-[#D92B27]' : 'w-2 bg-slate-300 group-hover:bg-slate-400'
-            }`} />
+            <div
+              className={`w-[2px] transition-all duration-500 rounded-full ${
+                idx === active
+                  ? 'h-10 bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]'
+                  : 'h-4 bg-white/30 group-hover:bg-white/60'
+              }`}
+            />
           </button>
         ))}
+      </div>
+
+      {/* Content container (reference image matching) */}
+      <div className="relative z-20 w-full h-full max-w-[1600px] mx-auto px-16 sm:px-24 flex flex-col justify-between py-12 md:py-16">
+        
+        {/* Top empty spacer */}
+        <div />
+
+        {/* Middle main content */}
+        <div className="max-w-2xl">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active}
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -25 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {/* Eyebrow tag: — Sion Tamil Church */}
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-white/60 font-light">—</span>
+                <span className="text-white/80 font-tech font-extrabold uppercase text-xs sm:text-sm tracking-[0.25em]">
+                  {slide.eyebrow}
+                </span>
+              </div>
+
+              {/* Main title: bold Khand uppercase style */}
+              <h1 className="font-khand font-bold uppercase text-white text-[clamp(48px,8vw,110px)] leading-[0.9] tracking-tight mb-6 drop-shadow-md">
+                {slide.title}
+              </h1>
+
+              {/* Subtitle description */}
+              <p className="text-white/80 text-sm sm:text-base font-sans font-medium leading-relaxed max-w-lg mb-8">
+                {slide.description}
+              </p>
+
+              {/* CTA action button */}
+              <Link
+                to={slide.ctaLink}
+                className="inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-[#D92B27] hover:bg-[#FFE600] hover:text-[#222d61] text-white text-xs font-tech font-extrabold uppercase tracking-widest transition-all duration-300 shadow-xl group"
+              >
+                <span>{slide.ctaText}</span>
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Bottom metadata & controls bar (reference image matching) */}
+        <div className="flex items-end justify-between pt-6 border-t border-white/10">
+          
+          {/* Bottom left subtitle + metadata */}
+          <div className="flex flex-wrap items-center gap-3 text-xs font-sans text-white/60 tracking-wide font-medium">
+            <span className="text-white/90 font-bold">{slide.subtitle}</span>
+            <span className="text-white/30">|</span>
+            <span className="font-tech text-white/70">{slide.yearTag}</span>
+          </div>
+
+          {/* Bottom right floating circular navigation buttons (reference image matching) */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={prevSlide}
+              aria-label="Previous Slide"
+              className="w-12 h-12 rounded-full bg-black/40 hover:bg-black/70 border border-white/15 text-white flex items-center justify-center backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <button
+              onClick={nextSlide}
+              aria-label="Next Slide"
+              className="w-12 h-12 rounded-full bg-white text-[#222d61] hover:bg-[#FFE600] flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+
+        </div>
+
       </div>
 
     </div>

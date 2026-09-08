@@ -2,12 +2,13 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Shield, Sparkles, Calendar, Clock, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { media } from '../lib/assets';
 
 const GALLERY = [
-  { src: '/yr.jpg',        alt: 'Youth Group Retreat' },
-  { src: '/yg2.webp',      alt: 'Youth Retreat Worship Session' },
-  { src: '/yg3.webp',      alt: 'SAY Group Fellowship' },
-  { src: '/DSC_0004.webp', alt: 'SAY Group Congregation' },
+  { src: media('/yr.jpg'),        alt: 'Youth Group Retreat' },
+  { src: media('/yg2.webp'),      alt: 'Youth Retreat Worship Session' },
+  { src: media('/yg3.webp'),      alt: 'SAY Group Fellowship' },
+  { src: media('/DSC_0004.webp'), alt: 'SAY Group Congregation' },
 ];
 
 const META = [
@@ -47,7 +48,7 @@ const SECTIONS = [
 
 export default function Youth() {
   return (
-    <div className="w-full bg-[#F8FAFC] min-h-screen text-[#0A1128] noise pb-24">
+    <div className="w-full bg-[#F8FAFC] min-h-screen text-[#222d61] noise pb-24">
 
       {/* ── Page header ─────────────────────────────────── */}
       <section className="relative bg-white pt-24 pb-16 px-4 md:px-10 border-b border-slate-200 overflow-hidden">
@@ -69,8 +70,8 @@ export default function Youth() {
               initial={{ y: '110%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[#0A1128] uppercase leading-[0.9] font-black"
-              style={{ fontSize: 'clamp(32px, 6vw, 80px)', letterSpacing: '-0.02em' }}
+              className="text-[#222d61] leading-[0.9] font-black"
+              style={{ fontSize: 'clamp(32px, 6vw, 80px)', letterSpacing: '-0.03em' }}
             >
               SAY Group
             </motion.h1>
@@ -100,7 +101,7 @@ export default function Youth() {
               transition={{ duration: 0.6 }}
               className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm"
             >
-              <h3 className="text-sm font-black uppercase text-[#0A1128] border-b border-slate-100 pb-4 mb-6 tracking-widest">
+              <h3 className="text-sm font-black uppercase text-[#222d61] border-b border-slate-100 pb-4 mb-6 tracking-widest">
                 Ministry Profile
               </h3>
 
@@ -112,7 +113,7 @@ export default function Youth() {
                     </div>
                     <div>
                       <span className="block text-[9px] font-black uppercase text-slate-400 tracking-wider">{m.label}</span>
-                      <span className="text-sm font-bold text-[#0A1128]">{m.value}</span>
+                      <span className="text-sm font-bold text-[#222d61]">{m.value}</span>
                     </div>
                   </div>
                 ))}
@@ -121,7 +122,7 @@ export default function Youth() {
               <div className="mt-8 pt-6 border-t border-slate-100">
                 <Link
                   to="/retreat"
-                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#0A1128] hover:bg-[#D92B27] text-white text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#222d61] hover:bg-[#D92B27] text-white text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
                 >
                   <Sparkles size={11} className="text-[#FFE600]" />
                   <span>Youth Retreat 2026 Info</span>
@@ -162,7 +163,7 @@ export default function Youth() {
             <div className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-sm space-y-8">
               {SECTIONS.map((s, i) => (
                 <div key={i}>
-                  <h3 className="text-lg sm:text-xl font-black uppercase text-[#0A1128] tracking-tight mb-3">
+                  <h3 className="text-lg sm:text-xl font-black uppercase text-[#222d61] tracking-tight mb-3">
                     {s.heading}
                   </h3>
                   <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-medium">

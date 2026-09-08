@@ -50,8 +50,13 @@ function PageLoader() {
 }
 
 export default function App() {
+  const basename =
+    typeof window !== 'undefined' && window.TSA_WP?.basename
+      ? window.TSA_WP.basename
+      : '';
+
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <ScrollToTop />
       <Layout>
         <Suspense fallback={<PageLoader />}>

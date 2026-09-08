@@ -4,6 +4,7 @@ import { Play } from 'lucide-react';
 interface YoutubeFacadeProps {
   videoId: string;
   title: string;
+  badge?: string;
 }
 
 /**
