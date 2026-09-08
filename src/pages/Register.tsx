@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import { ArrowRight, Sparkles, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import QRCode from 'react-qr-code';
 
 const GOOGLE_APP_SCRIPT_URL = import.meta.env.VITE_GOOGLE_APP_SCRIPT_URL || "";
@@ -62,6 +62,7 @@ function formatDateToMMDDYYYY(dateStr: string): string {
 export default function Register() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStep, setSubmitStep] = useState<0 | 1 | 2 | 3>(0); // 0=idle 1=validating 2=qr 3=saving
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -90,6 +91,7 @@ export default function Register() {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
+    setSubmitStep(1);
     setSubmitError(null);
     setIsDuplicate(false);
 
@@ -175,6 +177,7 @@ export default function Register() {
       // -------------------------------------------------------
       // STEP 2: Generate QR code with the SERVER UID
       // -------------------------------------------------------
+      setSubmitStep(2);
       const qrPayload = `${serverUid}|${finalPayload.name}|${finalPayload.dob}`;
       console.log("QR Payload with server UID:", qrPayload);
 
@@ -214,6 +217,7 @@ export default function Register() {
       // -------------------------------------------------------
       // STEP 3: Finalize registration with QR code
       // -------------------------------------------------------
+      setSubmitStep(3);
       const finalizeParams = new URLSearchParams();
       finalizeParams.append("name", finalPayload.name);
       finalizeParams.append("dob", finalPayload.dob);
@@ -284,8 +288,17 @@ export default function Register() {
       );
     } finally {
       setIsSubmitting(false);
+      setSubmitStep(0);
     }
   };
+
+  const STEPS: { label: string; sublabel: string }[] = [
+    { label: 'Validating details', sublabel: 'Checking your information…' },
+    { label: 'Generating your QR', sublabel: 'Creating your unique pass…' },
+    { label: 'Saving registration', sublabel: 'Almost there, hang tight…' },
+  ];
+
+  const currentStepInfo = submitStep > 0 ? STEPS[submitStep - 1] : null;
 
   return (
     <div className="retreat-site min-h-screen pt-24 sm:pt-32 pb-24 bg-[#F8FAFC] text-[#222d61]">
@@ -689,16 +702,10 @@ export default function Register() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:w-auto px-10 py-4 bg-[#D92B27] hover:bg-[#B81E1C] text-white font-black uppercase tracking-widest text-lg rounded-full shadow-lg hover:scale-105 active:scale-95 disabled:opacity-50 transition-all duration-300 flex items-center justify-center gap-3"
+              className="w-full sm:w-auto px-10 py-4 bg-[#D92B27] hover:bg-[#B81E1C] text-white font-black uppercase tracking-widest text-lg rounded-full shadow-lg hover:scale-105 active:scale-95 disabled:opacity-60 transition-all duration-300 flex items-center justify-center gap-3"
             >
-              {isSubmitting ? (
-                <span>Submitting Registration...</span>
-              ) : (
-                <>
-                  <span>Submit Form</span>
-                  <ArrowRight size={20} />
-                </>
-              )}
+              <span>Submit Form</span>
+              <ArrowRight size={20} />
             </button>
 
             <button
@@ -716,6 +723,115 @@ export default function Register() {
 
         </form>
       </div>
+
+      {/* ── SUBMISSION MODAL OVERLAY ── */}
+      <AnimatePresence>
+        {isSubmitting && (
+          <motion.div
+            key="submit-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-6"
+            style={{ backdropFilter: 'blur(12px)', background: 'rgba(34,45,97,0.55)' }}
+          >
+            <motion.div
+              initial={{ scale: 0.88, opacity: 0, y: 24 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 12 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-sm px-8 py-10 flex flex-col items-center gap-6 relative overflow-hidden"
+            >
+              {/* Red accent top bar */}
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#D92B27] via-[#ff6b68] to-[#D92B27]" />
+
+              {/* Pulsing icon ring */}
+              <div className="relative flex items-center justify-center">
+                <motion.div
+                  animate={{ scale: [1, 1.18, 1], opacity: [0.35, 0.15, 0.35] }}
+                  transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
+                  className="absolute w-20 h-20 rounded-full bg-[#D92B27]"
+                />
+                <div className="relative z-10 w-14 h-14 rounded-full bg-[#D92B27] flex items-center justify-center shadow-lg">
+                  <Loader2 size={26} className="animate-spin text-white" />
+                </div>
+              </div>
+
+              {/* Animated heading */}
+              <div className="text-center">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={submitStep}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.22 }}
+                    className="text-[#222d61] font-black text-xl tracking-tight"
+                  >
+                    {currentStepInfo?.label}
+                  </motion.p>
+                </AnimatePresence>
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={`sub-${submitStep}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2, delay: 0.05 }}
+                    className="text-slate-500 text-sm mt-1 font-medium"
+                  >
+                    {currentStepInfo?.sublabel}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+
+              {/* Progress bar */}
+              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full rounded-full bg-gradient-to-r from-[#D92B27] to-[#ff6b68]"
+                  initial={{ width: '5%' }}
+                  animate={{
+                    width: submitStep === 1 ? '33%' : submitStep === 2 ? '66%' : '95%',
+                  }}
+                  transition={{ duration: 0.7, ease: 'easeInOut' }}
+                />
+              </div>
+
+              {/* Step dots */}
+              <div className="flex items-center gap-3">
+                {STEPS.map((s, i) => {
+                  const stepNum = i + 1;
+                  const done = submitStep > stepNum;
+                  const active = submitStep === stepNum;
+                  return (
+                    <div key={i} className="flex flex-col items-center gap-1.5">
+                      <motion.div
+                        animate={{
+                          scale: active ? 1.2 : 1,
+                          backgroundColor: done ? '#16a34a' : active ? '#D92B27' : '#e2e8f0',
+                        }}
+                        transition={{ duration: 0.3 }}
+                        className="w-3 h-3 rounded-full"
+                      />
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${
+                          done ? 'text-green-600' : active ? 'text-[#D92B27]' : 'text-slate-300'
+                        }`}
+                      >
+                        {s.label.split(' ')[0]}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <p className="text-xs text-slate-400 font-medium text-center">Please don't close this page</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
